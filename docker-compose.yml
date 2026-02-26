@@ -1,0 +1,36 @@
+services:
+  server:
+    build:
+      context: .
+      # 최상단에 만들어둔 백엔드용 Dockerfile 지정
+      dockerfile: Dockerfile.backend
+    container_name: server
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    restart: unless-stopped
+    # 코드 변경시 컨테이너 재빌드 없이 반영하기 위한 볼륨 옵션
+    volumes:
+      - ./backend:/app/backend
+
+  client:
+    build:
+      context: ./frontend
+      # [개발 모드] 실시간 소스 반영(HMR)을 위해 Dockerfile.dev 사용
+      dockerfile: Dockerfile.dev
+      # [프로덕션 모드] Nginx 기반 배포용 테스트를 원할 경우 위 라인을 주석처리하고 아래를 사용
+      # dockerfile: Dockerfile
+    container_name: client
+    ports:
+      # Vite 개발 서버 포트 (Dockerfile.dev 사용 시)
+      - "5173:5173"
+      # Nginx 기본 포트 (프로덕션 Dockerfile 사용 시 5173:80으로 매핑 필요)
+      # - "5173:80"
+    volumes:
+      # 개발 모드에서만 소스 동기화가 필요합니다
+      - ./frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    depends_on:
+      - server

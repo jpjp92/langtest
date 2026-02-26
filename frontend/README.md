@@ -1,0 +1,54 @@
+# Billing AI Assistant - Frontend
+
+React와 Vite로 구축된 **요금 안내 AI 상담원**의 프론트엔드 웹 애플리케이션입니다. 
+사용자 친화적인 인터페이스와 실시간 채팅 경험을 위해 Tailwind CSS v4와 Framer Motion을 활용했습니다.
+
+> **💡 중요**: 로컬 개발 시 프론트엔드(`5173`)와 백엔드(`8000`)의 포트가 모두 열려 있어야 정상 작동합니다. 도커 사용 시에는 `docker-compose.yml`이 이 연결 과정을 자동으로 처리합니다.
+
+## 로컬 실행 (Development)
+
+개발용으로 프론트엔드를 실행하려면 터미널에서 아래 명령을 실행하세요:
+
+```bash
+# 1. 의존성 패키지 설치
+npm install
+
+# 2. 로컬 개발 서버 시작 (기본 포트 확인: 5173)
+npm run dev
+```
+
+서버가 실행되면 브라우저에서 `http://localhost:5173` 으로 접속합니다. (포트가 사용 중인 경우 다를 수 있습니다.)
+
+> **주의**: 프론트엔드가 AI와 정상 통신하려면 백엔드(FastAPI) 서버가 동시에 실행 중이어야 합니다 (`http://localhost:8000`).
+
+## 📦 운영용 빌드 (Production)
+
+배포를 위해 애플리케이션을 빌드할 때는 다음 명령을 사용합니다:
+
+```bash
+# 1. 정적 파일들(js, css 등)을 압축하고 최적화하여 `dist/` 폴더 생성
+npm run build
+
+# 2. 빌드된 산출물(`dist/`)이 어떻게 동작하는지 로컬에서 미리보기
+npm run preview
+```
+
+## 🐳 Docker로 실행하기 (Optional)
+
+Nginx를 기반으로 이미지를 빌드하여 실행하고 싶은 경우, 아래와 같이 진행할 수 있습니다. (프로젝트 내부 또는 상위에 `Dockerfile` 설정 필요)
+
+```bash
+# 1. 도커 이미지 빌드
+docker build -t billing-ai-frontend .
+
+# 2. 빌드된 이미지를 컨테이너로 실행 (포트 80 매핑 시)
+docker run -d -p 80:80 --name billing-frontend billing-ai-frontend
+```
+
+## 🛠 주요 기술 스택
+
+- **React(Vite)**: 최신 브라우저 기반의 컴포넌트 프레임워크
+- **Tailwind CSS (v4)**: 클래스 기반의 유틸리티 CSS 제공
+- **Framer Motion**: 부드러운 채팅 말풍선 및 화면 트랜지션
+- **Lucide React**: 깔끔한 SVG 아이콘 제공
+- **Axios**: 백엔드 API와의 통신 담당

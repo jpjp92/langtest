@@ -1,0 +1,312 @@
+# 요금 안내 AI 데모
+
+> **LangGraph**, **FastAPI**, 그리고 **React**를 사용하여 구축된 **지능형 요금 분석 및 안내 AI 에이전트** 서비스입니다. 단순히 요금제를 안내하는 것을 넘어, 사용자의 실제 청구 내역(Supabase DB)을 실시간으로 조회하고 **요금 초과 발생 원인(API 사용량, 부가서비스 가입 등)을 스스로 추론**하여 데이터 기반의 맞춤형 상담을 제공합니다.
+
+---
+
+## 🔄 시스템 아키텍처 및 서비스 플로우
+
+### 1. 전체 시스템 흐름
+사용자의 질문이 프론트엔드에서 백엔드로 전달되어 AI 에이전트가 도구를 선택하고 답변하는 전체 흐름입니다.
+
+```mermaid
+graph LR
+    User((사용자)) -- "1. 질문 메시지" --> UI
+  
+    subgraph "Frontend Layer"
+        UI[Chat Interface] -- "2. API 요청" --> Client[Axios Client]
+    end
+
+    subgraph "Backend Layer"
+        Client -- "3. POST /chat" --> Router[FastAPI Router]
+        Router -- "4. 메시지 전달" --> Agent[AI Agent]
+        Agent -- "5. 도구 선택 및 실행" --> Tools[Billing Tools]
+    end
+
+    subgraph "Data Layer"
+        Tools <--> DB[(Supabase DB)]
+    end
+
+    Agent -- "6. 결과 취합 및 답변 생성" --> Router
+    Router -- "7. JSON 응답" --> Client
+    Client -- "8. 상태 업데이트" --> UI
+    UI -- "9. 최종 답변 출력" --> User
+
+    style User fill:#f9f,stroke:#333,stroke-width:2px
+    style DB fill:#00f2fe,stroke:#333,stroke-width:2px
+```
+
+### 2. 에이전트 추론 프로세스 (ReAct Pattern)
+AI 에이전트가 판단하고 도구를 실행하는 내부 로직입니다.
+
+```mermaid
+sequenceDiagram
+    participant U as 사용자
+    participant A as AI 에이전트
+    participant T as Tools (DB/Calc)
+  
+    U->>A: "2월 요금이 왜 많이 나왔어?"
+    Note over A: 1. 질문 의도 파악
+    A->>T: fetch_billing_history(2월) 호출
+    T-->>A: {total: 69900, exceed_fee: 15000, ...} 반환
+    Note over A: 2. 초과 요금 확인 및 추가 분석 결정
+    A->>T: analyze_overage_cause(2월) 호출
+    T-->>A: {api_calls: 6000, addons: [...]} 반환
+    Note over A: 3. 모든 데이터 취합 및 최종 추론
+    A->>U: "API 호출 한도 초과 및 애드온 활성화가 원인입니다. 총액은 69,900원입니다."
+```
+---
+
+## 📂 프로젝트 구조 (Project Structure)
+전체 프로젝트는 크게 백엔드(Python), 프론트엔드(React), 그리고 인프라 설정으로 구성되어 있습니다.
+
+```text
+
+├── backend/               # 에이전트 로직 및 API 서버 (FastAPI + LangGraph)
+│   ├── main.py            # 핵심 AI 로직 및 엔드포인트
+│   └── README.md          # 백엔드 상세 기술 문서
+├── frontend/              # 사용자 인터페이스 (React + Vite)
+│   ├── src/               # React 컴포넌트 및 UI 로직
+│   ├── Dockerfile.dev     # 실시간 코드 반영(HMR) 개발용 설정
+│   └── README.md          # 프론트엔드 상세 가이드
+├── Dockerfile.backend     # 백엔드 컨테이너 빌드 설정
+├── docker-compose.yml     # 백엔드-프론트엔드 통합 운영 설정
+├── pyproject.toml         # Python 프로젝트 설정 및 의존성 (uv)
+└── run.sh                 # 로컬 환경 통합 실행용 스크립트
+```
+
+---
+
+## 🐳 Docker 설정
+
+> Docker Compose를 사용하면 별도의 로컬 설정 없이 전체 서비스를 일괄적으로 실행할 수 있습니다.
+
+### 1. Docker 환경 준비
+
+> 처음 Docker를 사용하는 경우, 아래 명령어로 필요한 툴을 설치하고 권한을 설정하세요.
+
+```bash
+# Docker 및 Compose 설치 (Ubuntu/WSL)
+sudo apt-get update && sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+# 1. 권한 영구 설정 (sudo 없이 사용)
+sudo usermod -aG docker $USER
+newgrp docker  # 현재 터미널에 즉시 반영 (또는 WSL 재시작)
+
+# 2. 서비스 시작
+sudo service docker start
+```
+
+### 2. WSL2 Docker 자동 시작 설정 (선택 사항)
+
+WSL2 환경에서는 시스템 시작 시 Docker가 자동으로 켜지지 않을 수 있습니다. 쉘 설정 파일(`~/.zshrc` 또는 `~/.bashrc`) 맨 하단에 아래 코드를 추가하면 터미널 실행 시 자동으로 Docker를 확인하고 실행합니다.
+
+```bash
+# ~/.zshrc 또는 ~/.bashrc 하단에 추가
+if ! service docker status > /dev/null 2>&1; then
+    echo "🐳 Starting Docker service..."
+    sudo service docker start
+fi
+```
+
+### 2. 빌드 및 실행
+
+```bash
+docker compose build   # 이미지 빌드
+docker compose up -d    # 백그라운드 실행
+```
+
+### 3. 상태 및 실시간 로그 확인
+
+```bash
+docker compose ps               # 실행 컨테이너 확인
+docker compose logs -f          # 전체 실시간 로그
+docker compose logs -f server   # 백엔드 로그만 계속 보기
+```
+
+### 4. 코드 수정 및 실시간 반영
+
+* **백엔드**: `backend/main.py` 파일 하단의 `reload=True` 설정과 볼륨 마운트 덕분에 코드 수정 시 **자동으로 재시작**됩니다.
+* **프론트엔드**: `frontend/Dockerfile.dev`를 사용하여 Vite 개발 서버가 실행 중입니다. 소스 코드를 수정하면 **HMR(Hot Module Replacement)**을 통해 브라우저에 즉시 반영됩니다.
+
+  * *참고: 기존 `frontend/Dockerfile`은 Nginx 기반의 배포용 설정이며, 현재는 실시간 수정을 위해 `Dockerfile.dev`를 사용하도록 설정되어 있습니다.*
+
+* docker 서비스 시작: 
+```bash
+sudo service docker start
+```
+
+* 권한 문제 발생시 소켓 권한 설정
+```bash
+sudo chmod 666 /var/run/docker.sock
+```
+
+* 재시작이 필요한 경우:
+```bash
+docker compose restart          # 전체 재시작
+docker compose restart server   # 백엔드 재시작
+docker compose restart client   # 프론트엔드 재시작
+```
+
+* 일시정지 필요한 경우:
+```bash
+docker compose pause          # 전체 일시정지
+docker compose pause server   # 백엔드 일시정지
+docker compose pause client   # 프론트엔드 일시정지
+```
+
+* 일시정지 해제 필요한 경우:
+```bash
+docker compose unpause          # 전체 일시정지 해제
+docker compose unpause server   # 백엔드 일시정지 해제
+docker compose unpause client   # 프론트엔드 일시정지 해제
+```
+
+* 중지 필요한 경우:
+```bash
+docker compose stop          # 전체 중지
+docker compose stop server   # 백엔드 중지
+docker compose stop client   # 프론트엔드 중지
+```
+
+* 재시작 필요한 경우:
+```bash
+docker compose start          # 전체 재시작
+docker compose start server   # 백엔드 재시작
+docker compose start client   # 프론트엔드 재시작
+```
+
+### 5. 불필요 도커 이미지 삭제
+
+```bash
+docker rmi ID # 예시: docker rmi b75a6bc59bf1
+```
+
+### 6. 테스트 경로
+
+* **프론트엔드**: [Web](http://172.25.231.60:5173/)
+* **백엔드 API**: [FastAPI - Swagger UI](http://172.25.231.60:8000/docs#/default/health_check_health_get)
+
+---
+
+## 로컬 개발 가이드
+
+개발 중 실시간 코드 반영(HMR)을 원하시면 로컬 환경에서 실행하는 것이 좋습니다.
+
+### 통합 실행 (Script)
+
+터미널 창 하나에서 백엔드와 프론트엔드를 동시에 띄웁니다.
+
+```bash
+chmod +x run.sh
+./run.sh
+```
+
+### 개별 실행 (Manual)
+
+#### ⚙️ Backend (Python/FastAPI)
+
+```bash
+# 프로젝트 루트에서 실행
+uv sync                # 의존성 설치
+uv run python backend/main.py
+```
+
+👉 상세 내용은 [backend/README.md](./backend/README.md) 참고
+
+#### 🎨 Frontend (React/Vite)
+
+```bash
+cd frontend
+npm install            # 패키지 설치
+npm run dev
+```
+
+👉 상세 내용은 [frontend/README.md](./frontend/README.md) 참고
+
+---
+
+## 주요 기능 (Core Features)
+
+- **AI 상담 에이전트**: LangGraph ReAct 패턴을 사용한 지능형 도구 선택
+- ** 요금 자동 계산**: `calculate_billing` 도구로 복수 플랜 사용 시 합계 산출
+- ** 예산 맞춤 추천**: `recommend_plan_by_budget` 도구로 최적 요금제 제안
+- ** 데이터 기반 조회 및 분석**: Supabase DB와 연동하여 청구 상세 내역과 초과 사유 로그 분석 (`fetch_billing_history`, `analyze_overage_cause`)
+- ** 액션 및 상태 변경 (Mutation)**: 사용자의 요청에 따라 즉시 또는 지정된 월부터 구독 요금제를 변경 및 예약하고 변경 이력을 DB에 관리 (`change_subscription_plan`)
+- **실시간 채팅 UI**: Framer Motion 애니메이션이 적용된 UI/UX
+
+---
+
+## 🛠 기술 스택 (Tech Stack)
+
+| 구분                    | 기술                                        |
+| :---------------------- | :------------------------------------------ |
+| **Model**         | Google Gemini 2.5 Flash / Flash-Lite        |
+| **Orchestration** | LangChain, LangGraph                        |
+| **Backend**       | Python 3.12, FastAPI, Uvicorn               |
+| **Frontend**      | React, Vite, Tailwind CSS v4, Framer Motion |
+| **Database**      | Supabase (PostgreSQL)                       |
+| **DevOps**        | Docker, Docker Compose, uv                  |
+
+---
+
+## 🔌 API 명세 요약 (API Usage)
+
+### POST `/chat`
+
+사용자의 질문을 처리하고 대화 이력을 반환합니다.
+
+**Request:**
+
+```json
+{
+  "message": "프로 요금제 3개월 가격 얼마야?",
+  "thread_id": "user_session_1"
+}
+```
+
+**Response:**
+
+```json
+[
+  { "role": "user", "content": "프로 요금제 3개월 가격 얼마야?" },
+  { "role": "assistant", "content": "프로 요금제는 월 29,900원이며, 3개월 총액은 89,700원입니다." }
+]
+```
+
+---
+
+## 🗄️ 데이터베이스 스키마
+
+**Supabase 테이블: `billing_history`**
+
+| 컬럼              | 타입            | 설명                                     |
+| :---------------- | :-------------- | :--------------------------------------- |
+| `user_id`       | `text`        | 사용자 식별 (예: user_123)               |
+| `billing_month` | `text`        | 청구 달 (예: 2026-02)                    |
+| `details`       | `jsonb`       | 요금 상세 (total, base_fee, discount 등) |
+| `subscription_info` | `jsonb`   | 구독 상태(current_plan 등) 및 변경 이력(change_history) 정보 |
+| `created_at`    | `timestamptz` | 데이터 생성 일시                         |
+
+---
+
+## 💡 참고: 프론트엔드 모드 전환 (Development vs Production)
+
+현재 `docker-compose.yml`은 실시간 코드 수정을 위해 **개발 모드**로 설정되어 있습니다. 상황에 따라 아래와 같이 설정을 변경할 수 있습니다.
+
+### 1. 개발 모드 (기본값)
+
+- **특징**: 코드 수정 시 즉시 반영(HMR), Vite 개발 서버 사용
+- **설정**:
+  - `dockerfile: Dockerfile.dev`
+  - `ports: - "5173:5173"`
+  - `volumes: - ./frontend:/app` 활성화
+
+### 2. 프로덕션 모드 (배포 테스트용)
+
+- **특징**: 빌드된 정적 파일을 Nginx가 서빙, 보안 및 성능 최적화 상태 확인 가능
+- **설정 변경 방법**:
+  1. `docker-compose.yml`에서 `dockerfile: Dockerfile.dev`를 주석 처리하고 `dockerfile: Dockerfile` 주석을 해제합니다.
+  2. `ports` 설정을 `5173:80`으로 변경합니다.
+  3. `volumes` 설정을 주석 처리합니다 (빌드된 이미지를 사용하므로).
+  4. `docker compose up -d --build` 명령어로 재빌드 및 실행합니다.
