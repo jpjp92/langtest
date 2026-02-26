@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Send, User, Bot, CreditCard, PieChart, HelpCircle, Loader2, AlertCircle } from 'lucide-react';
+import { Send, User, Bot, CreditCard, PieChart, HelpCircle, Loader2, AlertCircle, Zap, Calculator, TrendingUp } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -57,9 +57,10 @@ function App() {
   };
 
   const quickStyles = [
-    { icon: <CreditCard className="w-4 h-4" />, label: '요금제 종류 안내', text: '요금제 종류 알려워' },
-    { icon: <PieChart className="w-4 h-4" />, label: '2월 요금 상세 조회', text: '2월 요금 상세 내역 알려줘' },
-    { icon: <HelpCircle className="w-4 h-4" />, label: '예산 맞춤 추천', text: '연간 예산 20만원인데 추천해줘' },
+    { icon: <CreditCard className="w-5 h-5" />, label: '요금제 둘러보기', text: '현재 이용 가능한 모든 요금제 종류와 특징을 알려줘' },
+    { icon: <PieChart className="w-5 h-5" />, label: '월별 요금 분석', text: '지난 달 청구된 상세 요금 내역을 분석해줘' },
+    { icon: <Calculator className="w-5 h-5" />, label: '맞춤 요금 설계', text: '연간 예산 20만원으로 이용할 수 있는 최적의 요금제를 추천해줘' },
+    { icon: <TrendingUp className="w-5 h-5" />, label: '비용 절감 팁', text: '현재 요금에서 비용을 더 절약할 수 있는 방법이 있을까?' },
   ];
 
   return (
@@ -116,17 +117,17 @@ function App() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-4 w-full">
                 {quickStyles.map((item, idx) => (
                   <button
                     key={idx}
                     onClick={() => setInput(item.text)}
-                    className="flex flex-col items-center p-6 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md hover:border-brand-light transition-all group text-center space-y-3"
+                    className="flex flex-col items-center p-6 bg-white/80 backdrop-blur-sm border border-slate-100 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-brand/5 hover:border-brand-light hover:-translate-y-1 transition-all duration-300 group text-center space-y-4"
                   >
-                    <div className="p-3 bg-slate-50 rounded-xl text-slate-600 group-hover:bg-blue-50 group-hover:text-brand transition-colors">
+                    <div className="p-4 bg-slate-50 rounded-2xl text-slate-500 group-hover:bg-blue-50 group-hover:text-brand group-hover:scale-110 transition-all duration-300">
                       {item.icon}
                     </div>
-                    <span className="text-sm font-semibold text-slate-700">{item.label}</span>
+                    <span className="text-[15px] font-semibold text-slate-700 group-hover:text-slate-900 transition-colors">{item.label}</span>
                   </button>
                 ))}
               </div>
