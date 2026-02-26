@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Send, User, Bot, CreditCard, PieChart, HelpCircle, Loader2, AlertCircle, Zap, Calculator, ArrowRightLeft } from 'lucide-react';
+import { Send, User, Bot, CreditCard, PieChart, HelpCircle, Loader2, AlertCircle, Zap, Calculator, ArrowRightLeft, Info, X, Moon, Sun } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -20,6 +20,8 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [threadId] = useState(`user_${Math.random().toString(36).substring(7)}`);
   const scrollRef = useRef(null);
 
@@ -76,24 +78,85 @@ function App() {
             <p className="text-xs text-slate-500 font-medium">Billing Assistant</p>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          {/* Status Badge Removed - Non-functional */}
-          <div className="relative group flex items-center">
-            <button className="p-2 text-slate-400 hover:text-brand transition-colors">
-              <AlertCircle className="w-5 h-5" />
-            </button>
-            {/* Tooltip */}
-            <div className="absolute right-0 top-full mt-1 w-60 bg-slate-800 text-white text-xs rounded-xl p-3 shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50">
-              <p className="font-medium mb-1 border-b border-slate-600 pb-1">💡 이용 가이드</p>
-              <ul className="space-y-1 text-slate-300 leading-relaxed">
-                <li>• 특정 월의 요금 상세 조회</li>
-                <li>• 요금제 간의 금액 비교 및 계산</li>
-                <li>• 연간/월간 예산에 맞는 요금제 추천</li>
-              </ul>
-            </div>
-          </div>
+        <div className="flex items-center space-x-1">
+          {/* Dark Mode Toggle Skeleton */}
+          <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 text-slate-400 hover:text-brand transition-colors relative group">
+            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            <span className="absolute right-0 top-full mt-2 w-max bg-slate-800 text-white text-xs rounded-lg px-2 py-1 opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity">
+              다크 모드 준비중
+            </span>
+          </button>
+
+          {/* Sidebar Toggle */}
+          <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-600 hover:text-brand transition-colors bg-slate-100 hover:bg-blue-50 rounded-full">
+            <Info className="w-5 h-5" />
+          </button>
         </div>
       </header>
+
+      {/* Sidebar Overlay */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSidebarOpen(false)}
+              className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm z-40"
+            />
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="absolute top-0 right-0 h-full w-80 sm:w-96 bg-white/95 backdrop-blur-xl shadow-2xl z-50 border-l border-white/20 p-6 flex flex-col"
+            >
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-xl font-bold text-slate-800 flex items-center">
+                  <Info className="w-5 h-5 mr-3 text-brand" />
+                  AI 서비스 이용 가이드
+                </h2>
+                <button onClick={() => setIsSidebarOpen(false)} className="p-2 text-slate-400 hover:bg-slate-100 rounded-full transition-colors active:scale-95">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-6 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                <div className="space-y-3">
+                  <h3 className="text-[15px] font-semibold text-slate-800 flex items-center"><PieChart className="w-4 h-4 mr-2 text-blue-500" /> 월별 요금 상세 분석</h3>
+                  <p className="text-sm text-slate-600 bg-slate-50 p-4 rounded-2xl border border-slate-100 leading-relaxed">
+                    특정 월의 청구 내역을 확인하고 싶나요?<br />
+                    <span className="font-medium text-brand">"2월 요금 상세 내역을 분석해줘"</span> 라고 질문하면, 초과 요금 원인(API 초과 등)을 상세히 AI가 분석해 냅니다.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <h3 className="text-[15px] font-semibold text-slate-800 flex items-center"><Calculator className="w-4 h-4 mr-2 text-emerald-500" /> 예산 맞춤 요금제 추천</h3>
+                  <p className="text-sm text-slate-600 bg-slate-50 p-4 rounded-2xl border border-slate-100 leading-relaxed">
+                    갖고 있는 예산에서 최적의 효과를 내고 싶나요?<br />
+                    <span className="font-medium text-brand">"연간 예산 20만원으로 요금제 섞어서 추천해줘"</span> 와 같이 문의하시면 최적의 하이브리드 조합을 구성해 드립니다.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <h3 className="text-[15px] font-semibold text-slate-800 flex items-center"><ArrowRightLeft className="w-4 h-4 mr-2 text-indigo-500" /> 요금제 실시간/예약 변경</h3>
+                  <p className="text-sm text-slate-600 bg-slate-50 p-4 rounded-2xl border border-slate-100 leading-relaxed">
+                    에이전트를 통해 직접 구독 정보를 변경할 수 있어요.<br />
+                    <span className="font-medium text-brand">"다음 달부터 프로 요금제로 변경 예약해줘"</span> 라고 하면 즉시 DB 상태를 업데이트합니다.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-slate-100">
+                <p className="text-xs text-center text-slate-400 flex items-center justify-center font-medium">
+                  <Zap className="w-3 h-3 mr-1 text-amber-500" /> Powered by LangGraph
+                </p>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Chat Area */}
       <main
