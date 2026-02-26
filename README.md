@@ -310,3 +310,34 @@ npm run dev
   2. `ports` 설정을 `5173:80`으로 변경합니다.
   3. `volumes` 설정을 주석 처리합니다 (빌드된 이미지를 사용하므로).
   4. `docker compose up -d --build` 명령어로 재빌드 및 실행합니다.
+
+---
+
+## 🚀 클라우드 서비스 배포 (Deployment)
+
+이 프로젝트는 프론트엔드와 백엔드를 각각 분리하여 최신 클라우드 플랫폼에 배포할 수 있습니다.
+
+### 1. 백엔드 배포 (Render.com)
+백엔드는 Docker 환경 지원이 우수한 **Render**를 사용하여 무료로 배포할 수 있습니다.
+
+1. **Render**에 가입 후 **"New Web Service"**를 생성합니다.
+2. GitHub Repository를 연동합니다.
+3. 설정값을 다음과 같이 지정합니다:
+   - **Environment**: `Docker`
+   - **Root Directory**: `.` (루트 디렉토리 유지)
+   - **Dockerfile Path**: `./Dockerfile.backend`
+   - **Environment Variables**: 로컬 `.env`에 정의된 변수들을 모두 입력 (예: `GEMINI_API_KEY`, `SUPABASE_URL` 등)
+4. 배포가 완료되면 `https://your-service-name.onrender.com` 과 같은 URL이 발급됩니다.
+
+### 2. 프론트엔드 배포 (Vercel)
+프론트엔드는 React/Vite 호스팅에 최적화된 **Vercel**을 사용하여 빠르고 쉽게 배포합니다.
+
+1. **Vercel**에 가입 후 **"Add New Project"**를 클릭하여 GitHub Repository를 가져옵니다.
+2. 설정값을 다음과 같이 지정합니다:
+   - **Framework Preset**: `Vite` (자동 감지됨)
+   - **Root Directory**: `frontend`
+3. **Environment Variables**에 다음을 추가합니다:
+   - **Key**: `VITE_API_URL`
+   - **Value**: Render에서 발급받은 백엔드 URL (`https://your-service-name.onrender.com`)
+4. **Deploy** 버튼을 클릭합니다.
+5. 배포가 완료되면 글로벌 엣지 네트워크에서 서비스되는 프론트엔드 주소를 얻을 수 있습니다. 백엔드 주소가 변경된 경우 Vercel 환경 변수를 수정한 뒤 **Redeploy**만 진행하면 됩니다.
