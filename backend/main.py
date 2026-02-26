@@ -29,7 +29,7 @@ from dotenv import load_dotenv
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-# 외부 라이브러리(통신 모듈)의 너무 잦은 INFO 로그 표출 숨기기
+# 외부 라이브러리의 너무 잦은 INFO 로그 표출 숨기기
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 

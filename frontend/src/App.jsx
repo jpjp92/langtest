@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Send, User, Bot, CreditCard, PieChart, HelpCircle, Loader2, AlertCircle, Zap, Calculator, TrendingUp } from 'lucide-react';
+import { Send, User, Bot, CreditCard, PieChart, HelpCircle, Loader2, AlertCircle, Zap, Calculator, ArrowRightLeft } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -60,13 +60,13 @@ function App() {
     { icon: <CreditCard className="w-5 h-5" />, label: '요금제 둘러보기', text: '현재 이용 가능한 모든 요금제 종류와 특징을 알려줘' },
     { icon: <PieChart className="w-5 h-5" />, label: '월별 요금 분석', text: '지난 달 청구된 상세 요금 내역을 분석해줘' },
     { icon: <Calculator className="w-5 h-5" />, label: '맞춤 요금 설계', text: '연간 예산 20만원으로 이용할 수 있는 최적의 요금제를 추천해줘' },
-    { icon: <TrendingUp className="w-5 h-5" />, label: '비용 절감 팁', text: '현재 요금에서 비용을 더 절약할 수 있는 방법이 있을까?' },
+    { icon: <ArrowRightLeft className="w-5 h-5" />, label: '요금제 변경', text: '이용 중인 요금제를 변경하고 싶은데, 추천이나 변경 방법을 알려줄래?' },
   ];
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 overflow-hidden">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100 overflow-hidden relative">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm z-10">
+      <header className="bg-white/70 backdrop-blur-md border-b border-white/20 px-6 py-4 flex items-center justify-between shadow-sm z-20">
         <div className="flex items-center space-x-3">
           <div className="bg-brand w-10 h-10 rounded-xl flex items-center justify-center shadow-md shadow-blue-200">
             <CreditCard className="text-white w-6 h-6" />
@@ -98,7 +98,7 @@ function App() {
       {/* Chat Area */}
       <main
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-4 py-8 space-y-6 scroll-smooth"
+        className="flex-1 overflow-y-auto px-4 pt-8 pb-40 space-y-6 scroll-smooth z-0"
       >
         <AnimatePresence initial={false}>
           {messages.length === 0 && (
@@ -113,7 +113,7 @@ function App() {
                 </h2>
                 <p className="text-slate-500 text-lg">
                   요금 조회부터 개인화된 추천까지,<br />
-                  똑똑한 빌링 에이전트가 답변해 드립니다.
+                  빌링 에이전트가 답변해 드립니다.
                 </p>
               </div>
 
@@ -142,16 +142,16 @@ function App() {
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div className={`flex max-w-[85%] sm:max-w-[75%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2`}>
-                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mb-1 ${msg.role === 'user' ? 'ml-2 bg-slate-200' : 'mr-2 bg-brand text-white shadow-sm'
+                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mb-1 z-10 ${msg.role === 'user' ? 'ml-2 bg-slate-100 ring-2 ring-white/80' : 'mr-2 bg-brand text-white shadow-md ring-2 ring-white/80'
                   }`}>
-                  {msg.role === 'user' ? <User className="w-5 h-5 text-slate-600" /> : <Bot className="w-5 h-5" />}
+                  {msg.role === 'user' ? <User className="w-5 h-5 text-slate-500" /> : <Bot className="w-5 h-5" />}
                 </div>
 
-                <div className={`p-4 rounded-2xl shadow-sm ${msg.role === 'user'
-                  ? 'bg-blue-50 border border-blue-100 text-slate-800 rounded-br-none'
-                  : 'bg-white border border-slate-100 text-slate-800 rounded-bl-none'
+                <div className={`px-5 py-4 rounded-2xl shadow-sm relative ${msg.role === 'user'
+                  ? 'bg-gradient-to-br from-blue-600 to-brand text-white rounded-br-none shadow-blue-500/20'
+                  : 'bg-white/90 backdrop-blur-sm border border-slate-100/50 text-slate-800 rounded-bl-none shadow-slate-200/50'
                   }`}>
-                  <div className="prose prose-slate max-w-none text-sm leading-relaxed font-medium">
+                  <div className={`prose max-w-none text-[15px] leading-relaxed font-medium ${msg.role === 'user' ? 'prose-invert text-white' : 'prose-slate text-slate-700'}`}>
                     <ReactMarkdown>{msg.content}</ReactMarkdown>
                   </div>
                 </div>
@@ -178,9 +178,9 @@ function App() {
       </main>
 
       {/* Input Area */}
-      <footer className="bg-white border-t border-slate-200 p-4 md:p-6 shadow-2xl z-10">
-        <div className="max-w-4xl mx-auto">
-          <form onSubmit={handleSend} className="relative flex items-end">
+      <footer className="absolute bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-slate-50 via-slate-50/95 to-transparent z-10 pointer-events-none">
+        <div className="max-w-4xl mx-auto pointer-events-auto">
+          <form onSubmit={handleSend} className="relative flex items-end shadow-2xl shadow-brand/10 rounded-3xl bg-white/90 backdrop-blur-md border border-white p-2">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -190,24 +190,24 @@ function App() {
                   handleSend(e);
                 }
               }}
-              placeholder="요금관련 궁금한 점을 입력하세요."
-              className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-4 pr-14 py-4 text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-light focus:bg-white transition-all resize-none max-h-32 text-sm"
+              placeholder="요금관련 궁금한 점을 입력하세요..."
+              className="w-full bg-transparent p-4 pr-16 text-slate-800 placeholder:text-slate-400 focus:outline-none resize-none max-h-32 text-[15px] leading-relaxed"
               rows={1}
             />
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className={`absolute right-2 bottom-2 p-2.5 rounded-xl transition-all ${!input.trim() || isLoading
+              className={`absolute right-4 bottom-4 p-3 rounded-2xl transition-all duration-300 ${!input.trim() || isLoading
                 ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                : 'bg-brand text-white shadow-md hover:bg-brand-dark active:scale-95'
+                : 'bg-gradient-to-r from-brand to-blue-500 text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-0.5 active:translate-y-0'
                 }`}
             >
               <Send className="w-5 h-5" />
             </button>
           </form>
-          <div className="mt-3 text-center">
-            <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest">
-              Powered by Google Gemini & LangGraph
+          <div className="mt-4 text-center">
+            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-widest drop-shadow-sm">
+              Powered by Google Gemini ✦ LangGraph
             </p>
           </div>
         </div>
