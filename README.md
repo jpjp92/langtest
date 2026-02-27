@@ -311,14 +311,15 @@ npm run dev
 
 ## 🛠 기술 스택 (Tech Stack)
 
-| 구분                    | 기술                                        |
-| :---------------------- | :------------------------------------------ |
-| **Model**         | Google Gemini 2.5 Flash / Flash-Lite        |
-| **Orchestration** | LangChain, LangGraph                        |
-| **Backend**       | Python 3.12, FastAPI, Uvicorn               |
-| **Frontend**      | React, Vite, Tailwind CSS v4, Framer Motion |
-| **Database**      | Supabase (PostgreSQL)                       |
-| **DevOps**        | Docker, Docker Compose, uv                  |
+| 계층 (Layer)            | 세부 기술 (Technologies)                                      | 
+| :---------------------- | :---------------------------------------------------------- |
+| **Model**               | Google Gemini 2.5 Flash / 1.5 Flash                         |
+| **Orchestration**       | LangChain, LangGraph (ReAct Pattern)                        |
+| **Backend**             | Python 3.12, FastAPI, Uvicorn, Pydantic                     |
+| **Frontend**            | React 18, Vite, Tailwind CSS v4, Framer Motion              |
+| **Database**            | Supabase (PostgreSQL - `billing_history`, `evaluation_dataset`) |
+| **Eval (LLM-as-a-Judge)**| DeepEval, rich (UI CLI)                                     |
+| **DevOps & Package**    | Docker, Docker Compose, uv (Python), npm (Node)             |
 
 ---
 
