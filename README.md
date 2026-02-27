@@ -60,7 +60,7 @@ sequenceDiagram
     A->>U: "API 호출 한도 초과 및 애드온 활성화가 원인입니다. 총액은 69,900원입니다."
 ```
 
-**✅ 시나리오 B: 맞춤 추천 및 원격 구독 변경 프로세스** 
+**✅ 시나리오 B: 맞춤 추천 및 원격 구독 변경 프로세스**
 
 ```mermaid
 sequenceDiagram
@@ -94,8 +94,15 @@ Agent가 활용하는 도구들은 역할에 따라 기능적으로 완전히 �
 | 도구명 (함수명)                                 | 아키텍처 분류                                                             | 핵심 역할                                                                |
 | :---------------------------------------------- | :------------------------------------------------------------------------ | :----------------------------------------------------------------------- |
 | `calculate_billing,`recommend_plan_by_budget  | **Business Logic / Calculation Tools** (비즈니스 로직 및 계산 도구) | 내부 연산, 단가 정책 반영, 환각 방지 및 맞춤형 플랜 추천                 |
-| `fetch_billing_history,`analyze_overage_cause | **Data Retrieval **(데이터 검색 도구)                                     | 외부 데이터 연동(Supabase DB), 사실 기반의 요금 청구 및 로그 데이터 검색 |
+| `fetch_billing_history,`analyze_overage_cause | **Data Retrieval**(데이터 검색 도구)                                | 외부 데이터 연동(Supabase DB), 사실 기반의 요금 청구 및 로그 데이터 검색 |
 | `change_subscription_plan`                    | **Action / State Mutation Tools** (상태 변경 및 실행 도구)          | 실질적인 데이터 변화(월별 연계 상태 업데이트) 생성 및 DB 반영            |
+
+### 5. Pydantic 기반의 데이터 검증 (Data Validation)
+
+LangGraph 기반의 AI 에이전트 시스템에서 LLM(대규모 언어 모델)의 출력은 본질적으로 비정형 텍스트이므로 100% 신뢰할 수 없습니다. 따라서 본 프로젝트는 **Pydantic을 활용하여 시스템 전체의 안정성을 보장**하고 있습니다.
+
+- **AI 도구(Tool) 입력값 검증**: `@tool(args_schema=...)` 데코레이터를 사용하여 LLM이 도구(함수)를 호출할 때 전달하는 인자(Arguments)의 타입과 형태를 엄격하게 제한합니다. LLM에게 필드 설명을 명시(예: `budget: int = Field(...)`)하여 올바른 형식의 추론을 유도하고, 잘못된 타입의 데이터를 사전에 차단합니다.
+- **API 규격 검증 (FastAPI)**: 프론트엔드와 통신하는 API 요청/응답 시에도 `BaseModel`을 상속한 스키마(예: `ChatRequest`)를 정의합니다. 이를 통해 올바른 형식의 요청만 백엔드 로직에 도달하도록 하며, API 명세서(Swagger UI)를 자동 생성하는 이점도 확보했습니다.
 
 ---
 
