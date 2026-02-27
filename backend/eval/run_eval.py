@@ -101,11 +101,6 @@ async def main():
             expected_ans = data["expected_answer"]
             context_refs = data.get("context_references", [])
             
-            # API 제한 방지를 위한 고정 딜레이 (무료 티어 15 RPM 고려)
-            if idx > 0:
-                progress.update(main_task, description=f"[cyan]문항 {idx+1}/{len(eval_subset)} 준비 중 (API 쿨다운 대기)...")
-                await asyncio.sleep(15)
-
             progress.update(main_task, description=f"[cyan]문항 {idx+1}/{len(eval_subset)} 평가 중: [white]{question[:15]}...")
             
             # 시스템에 질문 던지기 (비동기)
@@ -120,19 +115,11 @@ async def main():
             )
             
             try:
-                # 각 메트릭마다 Rate limit 429 회피용 재시도 함수 사용 및 약간의 딜레이
+                # 각 메트릭마다 Rate limit 429 회피용 재시도 함수 사용
                 await measure_metric_with_retry(groundedness_metric, test_case)
-                await asyncio.sleep(3)
-                
                 await measure_metric_with_retry(evidenceability_metric, test_case)
-                await asyncio.sleep(3)
-                
                 await measure_metric_with_retry(clarity_metric, test_case)
-                await asyncio.sleep(3)
-                
                 await measure_metric_with_retry(atomicity_metric, test_case)
-                await asyncio.sleep(3)
-                
                 await measure_metric_with_retry(robustness_metric, test_case)
                 
                 # 가중치 계산 체계
@@ -180,7 +167,20 @@ async def main():
     
     if results_log:
         final_avg = total_scaled_score / len(results_log)
-        console.print(Panel(f"[bold gold1]🏆 미니 배치(5건) 최종 평균 평가 점수: {final_avg:.1f} / 100점[/bold gold1]", expand=False))
+        console.print(Panel(f"[bold gold1]🏆 미니 배치 최종 평균 평가 점수: {final_avg:.1f} / 100점[/bold gold1]", expand=False))
+
+        # 평가 결과를 JSON 파일로 히스토리 저장
+        output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "eval_results.json")
+        try:
+            with open(output_path, "w", encoding="utf-8") as f:
+                json.dump({
+                    "average_score": final_avg,
+                    "total_evaluated": len(results_log),
+                    "details": results_log
+                }, f, ensure_ascii=False, indent=2)
+            console.print(f"\n[green]💾 평가 결과가 파일로 안전하게 저장되었습니다: {output_path}[/green]")
+        except Exception as e:
+            console.print(f"\n[red]❌ 결과 저장 실패: {e}[/red]")
 
 if __name__ == "__main__":
     asyncio.run(main())
