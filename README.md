@@ -248,13 +248,13 @@ docker compose start server   # 백엔드 재시작
 docker compose start client   # 프론트엔드 재시작
 ```
 
-### 5. 불필요 도커 이미지 삭제
+* 불필요 도커 이미지 삭제:
 
 ```bash
 docker rmi ID # 예시: docker rmi b75a6bc59bf1
 ```
 
-### 6. 테스트 경로
+### 5. 테스트 경로
 
 * **프론트엔드**: [Web](http://172.25.231.60:5173/)
 * **백엔드 API**: [FastAPI - Swagger UI](http://172.25.231.60:8000/docs#/default/health_check_health_get)
