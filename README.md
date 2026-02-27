@@ -314,11 +314,11 @@ npm run dev
 | 계층 (Layer)            | 세부 기술 (Technologies)                                      | 
 | :---------------------- | :---------------------------------------------------------- |
 | **Model**               | Google Gemini 2.5 Flash / 1.5 Flash                         |
-| **Orchestration**       | LangChain, LangGraph (ReAct Pattern)                        |
+| **Orchestration**       | LangChain, LangGraph (ReAct Pattern, MemorySaver)           |
 | **Backend**             | Python 3.12, FastAPI, Uvicorn, Pydantic                     |
 | **Frontend**            | React 18, Vite, Tailwind CSS v4, Framer Motion              |
 | **Database**            | Supabase (PostgreSQL - `billing_history`, `evaluation_dataset`) |
-| **Eval (LLM-as-a-Judge)**| DeepEval, rich (UI CLI)                                     |
+| **Eval (LLM-as-a-Judge)**| DeepEval                                     |
 | **DevOps & Package**    | Docker, Docker Compose, uv (Python), npm (Node)             |
 
 ---
@@ -360,6 +360,20 @@ npm run dev
 | `details`           | `jsonb`       | 요금 상세 (total, base_fee, discount 등)                     |
 | `subscription_info` | `jsonb`       | 구독 상태(current_plan 등) 및 변경 이력(change_history) 정보 |
 | `created_at`        | `timestamptz` | 데이터 생성 일시                                             |
+
+<br>
+
+**Supabase 테이블: `evaluation_dataset` (LLM 평가용)**
+
+| 컬럼 | 타입 | 설명 |
+| :--- | :--- | :--- |
+| `id` | `uuid` (PK) | 평가 데이터 세트 고유 식별자 |
+| `question` | `text` | 평가에 사용되는 질문 (사용자 발화 모사) |
+| `expected_answer` | `text` | 정답 및 모범 가이드라인 (Robustness 검증용) |
+| `topic_path` | `jsonb` | 안내 카테고리 계층 구조 (예: `요금 > 모바일...`) |
+| `context_references` | `jsonb` | 필수 참조 문서 혹은 도구명 (Groundedness 검증용) |
+| `intent_type` | `text` | 사용자의 핵심 질문 의도명 (Factoid, Compare 등) |
+| `created_at` | `timestamptz` | 역대 평가 내역 생성 일시 |
 
 ---
 
