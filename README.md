@@ -39,7 +39,9 @@ graph LR
 
 ### 2. 에이전트 추론 프로세스 (ReAct Pattern)
 
-AI 에이전트가 판단하고 도구를 실행하는 내부 로직입니다.
+AI 에이전트가 판단하고 여러 도구를 실행하는 내부 로직입니다. 최근 추가된 **맞춤 요금제 추천** 및 **실시간 요금제 예약/변경** 기능까지 포함된 다양한 플로우를 완벽하게 지원합니다.
+
+**✅ 시나리오 A: 요금 상세 분석 프로세스**
 
 ```mermaid
 sequenceDiagram
@@ -54,8 +56,27 @@ sequenceDiagram
     Note over A: 2. 초과 요금 확인 및 추가 분석 결정
     A->>T: analyze_overage_cause(2월) 호출
     T-->>A: {api_calls: 6000, addons: [...]} 반환
-    Note over A: 3. 모든 데이터 취합 및 최종 추론
+    Note over A: 3. 데이터 취합 및 최종 추론
     A->>U: "API 호출 한도 초과 및 애드온 활성화가 원인입니다. 총액은 69,900원입니다."
+```
+
+**✅ 시나리오 B: 맞춤 추천 및 원격 구독 변경 프로세스** 
+
+```mermaid
+sequenceDiagram
+    participant U as 사용자
+    participant A as AI 에이전트
+    participant T as Tools (DB/Calc)
+  
+    U->>A: "연간 예산 20만원으로 요금제 추천하고 다음 달부터 그걸로 바꿔줘"
+    Note over A: 1. 예산 기반 추천 도구 판단
+    A->>T: recommend_plan_by_budget(budget=200000) 호출
+    T-->>A: "에센셜 플랜 + 베이직 하이브리드 조합 추천" 반환
+    Note over A: 2. 요금제 변경 로직 판단 (예약)
+    A->>T: change_subscription_plan(new_plan="essential", status="reserved") 호출
+    T-->>A: "DB 업데이트 성공 (다음 달 예약 완료)" 반환
+    Note over A: 3. 최종 결과 안내
+    A->>U: "예산에 맞춰 에센셜 플랜을 추천해 드립니다. 다음 달부터 해당 플랜으로 변경되도록 예약 처리를 완료했습니다."
 ```
 
 ### 3. LangGraph 기반 요금 Agent 워크플로우 분석
