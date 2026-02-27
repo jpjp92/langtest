@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
 @theme {
   --color-brand-light: #3b82f6;
   --color-brand: #1d4ed8;

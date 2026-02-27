@@ -7,6 +7,7 @@
 ## 🔄 시스템 아키텍처 및 서비스 플로우
 
 ### 1. 전체 시스템 흐름
+
 사용자의 질문이 프론트엔드에서 백엔드로 전달되어 AI 에이전트가 도구를 선택하고 답변하는 전체 흐름입니다.
 
 ```mermaid
@@ -37,6 +38,7 @@ graph LR
 ```
 
 ### 2. 에이전트 추론 프로세스 (ReAct Pattern)
+
 AI 에이전트가 판단하고 도구를 실행하는 내부 로직입니다.
 
 ```mermaid
@@ -55,9 +57,29 @@ sequenceDiagram
     Note over A: 3. 모든 데이터 취합 및 최종 추론
     A->>U: "API 호출 한도 초과 및 애드온 활성화가 원인입니다. 총액은 69,900원입니다."
 ```
+
+### 3. LangGraph 기반 요금 Agent 워크플로우 분석
+
+현재 Agent 아키텍처는 **ReAct(Reasoning and Acting) 패턴**을 완벽하게 구현하고 있으며, 유연성과 안정성(메모리 체크포인트)을 모두 확보한 상태입니다.
+
+- **Reasoning (생각 및 판단):** LLM(`billing_assistant` 노드)이 사용자의 질문을 분석하고, 어떤 도구를 조합해 문제를 해결할지 스스로 계획합니다.
+- **Routing (조건부 분기):** `should_use_tool` 함수를 통해 도구 사용이 필요하면 `tool_executor` 노드로 라우팅하고, 최종 답변이 완성되면 루프를 종료합니다.
+- **Acting (도구 실행):** LLM이 요청한 도구를 실행(`tool_executor`)하고 그 결과를 상태 메모리에 저장합니다. 결과는 다시 에이전트에게 전달되어 재차 판단(Reasoning)에 사용됩니다.
+
+### 4. 세부 도구 (Custom Tools) 설계 현황
+
+Agent가 활용하는 도구들은 역할에 따라 기능적으로 완전히 분리되어 설계되었습니다. 이를 통해 LLM의 환각을 제어하고, 정확한 데이터 기반의 상담을 제공합니다.
+
+| 도구명 (함수명)                                 | 아키텍처 분류                                                             | 핵심 역할                                                                |
+| :---------------------------------------------- | :------------------------------------------------------------------------ | :----------------------------------------------------------------------- |
+| `calculate_billing,`recommend_plan_by_budget  | **Business Logic / Calculation Tools** (비즈니스 로직 및 계산 도구) | 내부 연산, 단가 정책 반영, 환각 방지 및 맞춤형 플랜 추천                 |
+| `fetch_billing_history,`analyze_overage_cause | **Data Retrieval **(데이터 검색 도구)                                     | 외부 데이터 연동(Supabase DB), 사실 기반의 요금 청구 및 로그 데이터 검색 |
+| `change_subscription_plan`                    | **Action / State Mutation Tools** (상태 변경 및 실행 도구)          | 실질적인 데이터 변화(월별 연계 상태 업데이트) 생성 및 DB 반영            |
+
 ---
 
 ## 📂 프로젝트 구조 (Project Structure)
+
 전체 프로젝트는 크게 백엔드(Python), 프론트엔드(React), 그리고 인프라 설정으로 구성되어 있습니다.
 
 ```text
@@ -130,18 +152,20 @@ docker compose logs -f server   # 백엔드 로그만 계속 보기
 * **프론트엔드**: `frontend/Dockerfile.dev`를 사용하여 Vite 개발 서버가 실행 중입니다. 소스 코드를 수정하면 **HMR(Hot Module Replacement)**을 통해 브라우저에 즉시 반영됩니다.
 
   * *참고: 기존 `frontend/Dockerfile`은 Nginx 기반의 배포용 설정이며, 현재는 실시간 수정을 위해 `Dockerfile.dev`를 사용하도록 설정되어 있습니다.*
+* docker 서비스 시작:
 
-* docker 서비스 시작: 
 ```bash
 sudo service docker start
 ```
 
 * 권한 문제 발생시 소켓 권한 설정
+
 ```bash
 sudo chmod 666 /var/run/docker.sock
 ```
 
 * 재시작이 필요한 경우:
+
 ```bash
 docker compose restart          # 전체 재시작
 docker compose restart server   # 백엔드 재시작
@@ -149,6 +173,7 @@ docker compose restart client   # 프론트엔드 재시작
 ```
 
 * 일시정지 필요한 경우:
+
 ```bash
 docker compose pause          # 전체 일시정지
 docker compose pause server   # 백엔드 일시정지
@@ -156,6 +181,7 @@ docker compose pause client   # 프론트엔드 일시정지
 ```
 
 * 일시정지 해제 필요한 경우:
+
 ```bash
 docker compose unpause          # 전체 일시정지 해제
 docker compose unpause server   # 백엔드 일시정지 해제
@@ -163,6 +189,7 @@ docker compose unpause client   # 프론트엔드 일시정지 해제
 ```
 
 * 중지 필요한 경우:
+
 ```bash
 docker compose stop          # 전체 중지
 docker compose stop server   # 백엔드 중지
@@ -170,6 +197,7 @@ docker compose stop client   # 프론트엔드 중지
 ```
 
 * 재시작 필요한 경우:
+
 ```bash
 docker compose start          # 전체 재시작
 docker compose start server   # 백엔드 재시작
@@ -280,13 +308,13 @@ npm run dev
 
 **Supabase 테이블: `billing_history`**
 
-| 컬럼              | 타입            | 설명                                     |
-| :---------------- | :-------------- | :--------------------------------------- |
-| `user_id`       | `text`        | 사용자 식별 (예: user_123)               |
-| `billing_month` | `text`        | 청구 달 (예: 2026-02)                    |
-| `details`       | `jsonb`       | 요금 상세 (total, base_fee, discount 등) |
-| `subscription_info` | `jsonb`   | 구독 상태(current_plan 등) 및 변경 이력(change_history) 정보 |
-| `created_at`    | `timestamptz` | 데이터 생성 일시                         |
+| 컬럼                  | 타입            | 설명                                                         |
+| :-------------------- | :-------------- | :----------------------------------------------------------- |
+| `user_id`           | `text`        | 사용자 식별 (예: user_123)                                   |
+| `billing_month`     | `text`        | 청구 달 (예: 2026-02)                                        |
+| `details`           | `jsonb`       | 요금 상세 (total, base_fee, discount 등)                     |
+| `subscription_info` | `jsonb`       | 구독 상태(current_plan 등) 및 변경 이력(change_history) 정보 |
+| `created_at`        | `timestamptz` | 데이터 생성 일시                                             |
 
 ---
 
@@ -318,6 +346,7 @@ npm run dev
 이 프로젝트는 프론트엔드와 백엔드를 각각 분리하여 최신 클라우드 플랫폼에 배포할 수 있습니다.
 
 ### 1. 백엔드 배포 (Render.com)
+
 백엔드는 Docker 환경 지원이 우수한 **Render**를 사용하여 무료로 배포할 수 있습니다.
 
 1. **Render**에 가입 후 **"New Web Service"**를 생성합니다.
@@ -330,6 +359,7 @@ npm run dev
 4. 배포가 완료되면 `https://your-service-name.onrender.com` 과 같은 URL이 발급됩니다.
 
 ### 2. 프론트엔드 배포 (Vercel)
+
 프론트엔드는 React/Vite 호스팅에 최적화된 **Vercel**을 사용하여 빠르고 쉽게 배포합니다.
 
 1. **Vercel**에 가입 후 **"Add New Project"**를 클릭하여 GitHub Repository를 가져옵니다.
