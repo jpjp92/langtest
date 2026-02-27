@@ -313,7 +313,7 @@ npm run dev
 
 | 계층 (Layer)            | 세부 기술 (Technologies)                                      | 
 | :---------------------- | :---------------------------------------------------------- |
-| **Model**               | Google Gemini 2.5 Flash / 1.5 Flash                         |
+| **Model**               | Google Gemini 2.5 Flash/ gemini-3-flash-preview                         |
 | **Orchestration**       | LangChain, LangGraph (ReAct Pattern, MemorySaver)           |
 | **Backend**             | Python 3.12, FastAPI, Uvicorn, Pydantic                     |
 | **Frontend**            | React 18, Vite, Tailwind CSS v4, Framer Motion              |
