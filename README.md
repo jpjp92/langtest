@@ -104,6 +104,19 @@ LangGraph 기반의 AI 에이전트 시스템에서 LLM(대규모 언어 모델)
 - **AI 도구(Tool) 입력값 검증**: `@tool(args_schema=...)` 데코레이터를 사용하여 LLM이 도구(함수)를 호출할 때 전달하는 인자(Arguments)의 타입과 형태를 엄격하게 제한합니다. LLM에게 필드 설명을 명시(예: `budget: int = Field(...)`)하여 올바른 형식의 추론을 유도하고, 잘못된 타입의 데이터를 사전에 차단합니다.
 - **API 규격 검증 (FastAPI)**: 프론트엔드와 통신하는 API 요청/응답 시에도 `BaseModel`을 상속한 스키마(예: `ChatRequest`)를 정의합니다. 이를 통해 올바른 형식의 요청만 백엔드 로직에 도달하도록 하며, API 명세서(Swagger UI)를 자동 생성하는 이점도 확보했습니다.
 
+### 6. LLM-as-a-Judge 기반 평가 자동화 (DeepEval)
+
+에이전트 답변의 품질을 지속적으로 관리하기 위해 **DeepEval 프레임워크**를 도입하여 `LLM-as-a-Judge` 평가 파이프라인(`backend/eval/run_eval.py`)을 구축했습니다.
+평가 데이터셋은 Supabase의 `evaluation_dataset` 테이블에서 중앙 관리하며, 다음과 같은 5개의 다면적인 커스텀 지표(GEval)를 기준으로 채점하여 가중치 100점 만점으로 환산합니다.
+
+- **정합성 (Groundedness, 25%)**: 환각 없이 주어진 검색 컨텍스트(기술문서, DB조회결과) 내에서만 답변했는가
+- **증거가능성 (Evidenceability, 15%)**: 답변이 컨텍스트의 구체적인 수치/섹션을 명시적으로 참조하는가
+- **명확성 (Clarity, 10%)**: 모호한 대명사를 피하고 답변 범위가 분명한가
+- **원자성 (Atomicity, 10%)**: 불필요한 부연 설명 없이 사용자가 요구한 단일 과업에만 집중했는가
+- **의미강건성 (Semantic Robustness, 5%)**: 단순 키워드 매칭이 아닌 사용자 질문의 숨은 의도를 파악했는가
+
+> *평가 로직 최적화*: Google Gemini의 `2.5-flash` 모델을 평가자(Judge)로 지정하고 API Rate Limit 방어 로직(비동기 대기 및 재시도)을 적용하였으며, `rich` 라이브러리로 터미널 프로그래스 바 및 결과 테이블 UI를 제공합니다.
+
 ---
 
 ## 📂 프로젝트 구조 (Project Structure)
@@ -113,6 +126,9 @@ LangGraph 기반의 AI 에이전트 시스템에서 LLM(대규모 언어 모델)
 ```text
 
 ├── backend/               # 에이전트 로직 및 API 서버 (FastAPI + LangGraph)
+│   ├── eval/              # LLM-as-a-Judge 평가 파이프라인 (DeepEval)
+│   │   ├── eval_metrics.py # 커스텀 평가 지표(GEval) 정의
+│   │   └── run_eval.py    # 평가 실행 및 결과 스크립트
 │   ├── main.py            # 핵심 AI 로직 및 엔드포인트
 │   └── README.md          # 백엔드 상세 기술 문서
 ├── frontend/              # 사용자 인터페이스 (React + Vite)

@@ -1,0 +1,42 @@
+[
+    {
+        "id": "q_001",
+        "topic_path": "요금 > 모바일 > 라이트 요금제 > 요금안내",
+        "question": "라이트 요금제의 월 기본료는 얼마인가요?",
+        "expected_answer": "라이트 요금제는 월 9,900원입니다.",
+        "context_references": [
+            "System Prompt > Service Information > Lite"
+        ],
+        "intent_type": "factoid"
+    },
+    {
+        "id": "q_002",
+        "topic_path": "요금 > 청구서 > 분석내역 > 초과 요금 사유",
+        "question": "이번 달 청구 요금이 평소보다 왜 이렇게 많이 나왔나요?",
+        "expected_answer": "요금 초과 사유(API 호출 한도 초과 또는 부가서비스 가입 등)를 분석하여 안내합니다.",
+        "context_references": [
+            "Tools > analyze_overage_cause"
+        ],
+        "intent_type": "why"
+    },
+    {
+        "id": "q_003",
+        "topic_path": "결제 > 수단 > 신용카드 > 종류",
+        "question": "요금 결제할 때 사용할 수 있는 신용카드는 어떤 것들이 있나요?",
+        "expected_answer": "국내/해외 주요 신용카드(Visa, Master, 현대, 삼성 등)를 모두 사용할 수 있습니다.",
+        "context_references": [
+            "System Prompt > Payment Methods > Credit Cards"
+        ],
+        "intent_type": "list"
+    },
+    {
+        "id": "q_004",
+        "topic_path": "요금 > 모바일 > 추천 > 예산맞춤",
+        "question": "1년 예산이 20만원인데 어떤 요금제를 쓰는게 좋을까요?",
+        "expected_answer": "예산 20만원에 맞춰 라이트 요금제 기본 사용 및 특정 월 프로 요금제 업그레이드 조합 등을 추천합니다.",
+        "context_references": [
+            "Tools > recommend_plan_by_budget"
+        ],
+        "intent_type": "how"
+    }
+]

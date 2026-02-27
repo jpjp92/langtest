@@ -1,0 +1,134 @@
+[
+  {
+    "id": "syn_qa_001",
+    "topic_path": "요금제 > 라이트 > 요금 및 기능",
+    "question": "라이트 요금제의 월 이용료는 얼마인가요? 어떤 기능들이 포함되어 있나요?",
+    "expected_answer": "라이트 요금제는 월 9,900원이며, 기본 분석, 채팅 지원, API 100회 호출이 포함됩니다.",
+    "context_references": [
+      "서비스 정보"
+    ],
+    "intent_type": "factoid"
+  },
+  {
+    "id": "syn_qa_002",
+    "topic_path": "요금제 > 비교",
+    "question": "프로 요금제와 라이트 요금제의 주요 차이점은 무엇인가요?",
+    "expected_answer": "프로 요금제는 월 29,900원으로 고급 시각화, 우선 지원, API 1,000회 호출을 제공하는 반면, 라이트 요금제는 월 9,900원에 기본 분석, 채팅 지원, API 100회 호출을 제공합니다.",
+    "context_references": [
+      "서비스 정보"
+    ],
+    "intent_type": "list"
+  },
+  {
+    "id": "syn_qa_003",
+    "topic_path": "요금제 > 엔터프라이즈 > 가입",
+    "question": "엔터프라이즈 요금제에 가입하려면 어떻게 해야 하나요?",
+    "expected_answer": "엔터프라이즈 요금제는 맞춤 API, 전담 매니저, 무제한 기능을 제공하며, 가입을 위해서는 별도 문의가 필요합니다.",
+    "context_references": [
+      "서비스 정보"
+    ],
+    "intent_type": "how"
+  },
+  {
+    "id": "syn_qa_004",
+    "topic_path": "요금 > 초과 요금 > 원인 분석",
+    "question": "이번 달 요금이 평소보다 많이 나왔는데, 왜 초과 청구되었는지 상세하게 알려줄 수 있나요?",
+    "expected_answer": "`analyze_overage_cause` 기능을 통해 API 호출 초과나 부가서비스 이용 등 요금 초과 사유를 상세하게 분석해 드릴 수 있습니다.",
+    "context_references": [
+      "기능 및 도구 가이드 > analyze_overage_cause"
+    ],
+    "intent_type": "how"
+  },
+  {
+    "id": "syn_qa_005",
+    "topic_path": "요금제 > 변경 > 절차",
+    "question": "현재 라이트 요금제를 사용 중인데, 다음 달부터 프로 요금제로 바꾸고 싶습니다. 변경 절차는 어떻게 되나요?",
+    "expected_answer": "`change_subscription_plan` 기능을 이용하여 다음 달부터 프로 요금제로 변경을 예약할 수 있습니다. 즉시 변경이나 특정 달로의 예약도 가능합니다.",
+    "context_references": [
+      "기능 및 도구 가이드 > change_subscription_plan"
+    ],
+    "intent_type": "procedure"
+  },
+  {
+    "id": "syn_qa_006",
+    "topic_path": "결제 > 수단",
+    "question": "결제 시 어떤 수단들을 이용할 수 있나요?",
+    "expected_answer": "신용카드(국내/해외 비자, 마스터, 삼성 등), 간편결제(카카오페이, 네이버페이, 애플페이), 그리고 계좌이체, 자동이체 등 다양한 결제 수단을 이용하실 수 있습니다.",
+    "context_references": [
+      "결제수단"
+    ],
+    "intent_type": "list"
+  },
+  {
+    "id": "syn_qa_007",
+    "topic_path": "요금 > 계산",
+    "question": "프로 요금제를 3개월 동안 사용하면 총 얼마를 지불해야 하나요?",
+    "expected_answer": "`calculate_billing` 기능을 통해 요금제별 개월 수를 합산하여 총 요금을 산출할 수 있습니다. 프로 요금제는 월 29,900원이므로 3개월 사용 시 총 89,700원입니다.",
+    "context_references": [
+      "기능 및 도구 가이드 > calculate_billing",
+      "서비스 정보"
+    ],
+    "intent_type": "how"
+  },
+  {
+    "id": "syn_qa_008",
+    "topic_path": "요금 > 청구서 > 조회",
+    "question": "지난해 12월 청구서 내역을 확인하고 싶은데, 조회할 수 있나요?",
+    "expected_answer": "네, `fetch_billing_history` 기능을 사용하여 특정 연월의 청구서(기본료, 초과 이용료, 할인액 등)를 조회할 수 있습니다.",
+    "context_references": [
+      "기능 및 도구 가이드 > fetch_billing_history"
+    ],
+    "intent_type": "how"
+  },
+  {
+    "id": "syn_qa_009",
+    "topic_path": "요금제 > 추천",
+    "question": "월 1만원 정도의 예산으로 사용할 수 있는 요금제가 있을까요?",
+    "expected_answer": "`recommend_plan_by_budget` 기능을 통해 예산과 기간을 입력하시면 최적의 요금제를 제안해 드릴 수 있습니다. 월 1만원 예산이라면 라이트 요금제(월 9,900원)가 적합합니다.",
+    "context_references": [
+      "기능 및 도구 가이드 > recommend_plan_by_budget",
+      "서비스 정보"
+    ],
+    "intent_type": "how"
+  },
+  {
+    "id": "syn_qa_010",
+    "topic_path": "결제 > 수단 > 간편결제",
+    "question": "애플페이로 결제하는 것이 가능한가요?",
+    "expected_answer": "네, 간편결제 수단으로 애플페이를 지원합니다.",
+    "context_references": [
+      "결제수단"
+    ],
+    "intent_type": "boolean"
+  },
+  {
+    "id": "syn_qa_011",
+    "topic_path": "요금제 > 라이트 > API 제한",
+    "question": "라이트 요금제 사용 시 한 달에 API를 몇 회까지 호출할 수 있나요?",
+    "expected_answer": "라이트 요금제는 월 100회의 API 호출을 지원합니다.",
+    "context_references": [
+      "서비스 정보"
+    ],
+    "intent_type": "factoid"
+  },
+  {
+    "id": "syn_qa_012",
+    "topic_path": "요금제 > 프로 > 지원",
+    "question": "프로 요금제 이용 고객은 우선적으로 지원을 받을 수 있나요?",
+    "expected_answer": "네, 프로 요금제에는 우선 지원 혜택이 포함되어 있습니다.",
+    "context_references": [
+      "서비스 정보"
+    ],
+    "intent_type": "boolean"
+  },
+  {
+    "id": "syn_qa_013",
+    "topic_path": "요금제 > 엔터프라이즈 > API",
+    "question": "엔터프라이즈 요금제만의 특별한 API 기능이 제공되나요?",
+    "expected_answer": "네, 엔터프라이즈 요금제는 맞춤형 API 기능을 제공합니다.",
+    "context_references": [
+      "서비스 정보"
+    ],
+    "intent_type": "factoid"
+  }
+]
