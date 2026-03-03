@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv, find_dotenv
 
-# 루트 폴더의 .env 파일을 찾아 명시적으로 로드합니다.
+# .env 파일 로드
 load_dotenv(find_dotenv())
 
 from deepeval.metrics import GEval

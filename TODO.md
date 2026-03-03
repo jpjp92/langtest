@@ -9,8 +9,9 @@
 ### 📌 A. 프로덕션 로그 기반 수집 (Human-in-the-Loop)
 - **개요**: 실제 서비스에서 사용자와 AI 에이전트가 나눈 대화 중 품질이 높은 데이터를 평가 데이터로 편입시킵니다.
 - **구현 방안**:
-  - 사용자 피드백(👍/👎 버튼) 연동: 사용자가 '좋아요'를 누른 답변(또는 관리자가 채택한 답변)의 `질문(Question)`, `답변(Expected Answer)`, `검색된 도구/문맥(Context)`을 Supabase `evaluation_dataset` 테이블에 자동 보관하는 로직 추가.
-  - 정기 모니터링: 주기적으로 LangSmith 등 트레이싱 도구를 확인하여 잘못된 답변이 나온 케이스(Edge case)를 수동으로 발췌하고, 정답(Expected Answer)을 교정하여 오답 노트 형식으로 DB에 추가.
+  - **데이터베이스 분리**: 사용자의 모든 대화 원문과 피드백(👍/👎) 등 원시 로그는 `evaluation_logs` (대화 기록 전용) 테이블에 1차적으로 일괄 저장합니다.
+  - **사용자 피드백(👍/👎 버튼) 연동**: 사용자가 '좋아요(👍)'를 누른 고품질 답변은 `evaluation_logs`에 저장됨과 동시에, 자동으로 AI 채점용 정답지 테이블인 `evaluation_dataset`에도 함께 복사/업데이트되는 파이프라인을 구축합니다.
+  - **정기 모니터링 관리 (싫어요 👎 데이터 활용)**: 관리자가 주기적으로 `evaluation_logs` 테이블의 오답 케이스를 조회하여 모범 답안으로 수정한 뒤, 수동으로 `evaluation_dataset`에 추가하여 모델 재학습(개선)에 활용합니다.
 
 ### 📌 B. 도메인 전문가 중심의 케이스 큐레이션
 - **개요**: 시스템이 커버하기 어려운 예외/복합 상황(Edge Cases)을 수동으로 구성합니다.
@@ -48,5 +49,6 @@
 
 ## 🚀 다음 실행 계획 (Next Steps)
 - [x] `generate_qa.py` 스크립트를 업그레이드하여, 다양한 조건과 상황이 부여된 합성 데이터(Synthetic Data)를 대량으로 자동 생성하고 DB에 병합하는 기능 추가.
-- [ ] Frontend 채팅창에 👍/👎 피드백 버튼 추가 후 Backend API로 데이터 전송 파이프라인 구성.
-- [ ] `eval_results.json`에 대한 통계/대시보드 화면(Frontend) 구축.
+- [x] Supabase에 사용자 발화, 모델 응답, 피드백을 수집할 원시 로그 적재용 `evaluation_logs` 테이블 신규 생성.
+- [ ] Frontend 채팅창에 👍/👎 피드백 버튼 추가 및 Backend API 연동 (👍 클릭 시 `evaluation_logs`와 `evaluation_dataset` 동시 업데이트).
+- [ ] `eval_results.json` 및 `evaluation_logs`에 대한 통계/대시보드 화면(Frontend) 구축.
