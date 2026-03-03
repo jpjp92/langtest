@@ -47,5 +47,6 @@
 ---
 
 ## 🚀 다음 실행 계획 (Next Steps)
-- [ ] `generate_qa.py` 스크립트를 업그레이드하여, 기존 DB 데이터를 읽어와서 `Paraphrasing` 증강을 거친 뒤 다시 삽입하는 기능 추가.
+- [x] `generate_qa.py` 스크립트를 업그레이드하여, 다양한 조건과 상황이 부여된 합성 데이터(Synthetic Data)를 대량으로 자동 생성하고 DB에 병합하는 기능 추가.
 - [ ] Frontend 채팅창에 👍/👎 피드백 버튼 추가 후 Backend API로 데이터 전송 파이프라인 구성.
+- [ ] `eval_results.json`에 대한 통계/대시보드 화면(Frontend) 구축.

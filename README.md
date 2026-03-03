@@ -115,7 +115,7 @@ LangGraph 기반의 AI 에이전트 시스템에서 LLM(대규모 언어 모델)
 - **원자성 (Atomicity, 10%)**: 불필요한 부연 설명 없이 사용자가 요구한 단일 과업에만 집중했는가
 - **의미강건성 (Semantic Robustness, 5%)**: 단순 키워드 매칭이 아닌 사용자 질문의 숨은 의도를 파악했는가
 
-> *평가 로직 최적화*: Google Gemini의 `2.5-flash` 모델을 평가자(Judge)로 지정하고 API Rate Limit 방어 로직(비동기 대기 및 재시도)을 적용하였으며, `rich` 라이브러리로 터미널 프로그래스 바 및 결과 테이블 UI를 제공합니다.
+> *평가 로직 최적화*: Google Gemini의 `2.5-flash` 모델을 평가자(Judge)로 활용합니다. 프롬프트 내에 컨텍스트(도구의 반환값 등)를 풍부하게 삽입하여 Groundedness 오탐을 방지했으며, 평가 속도 향상 및 `Rate Limit(429)` 회피를 위해 전용 `EVAL_GEMINI_API_KEY`(Tier 1 등) 환경변수를 분리해 사용합니다. 또한 `rich` 라이브러리로 터미널 프로그래스 바 및 결과 테이블 UI를 제공합니다.
 
 ---
 
@@ -370,10 +370,11 @@ npm run dev
 | `id` | `uuid` (PK) | 평가 데이터 세트 고유 식별자 |
 | `question` | `text` | 평가에 사용되는 질문 (사용자 발화 모사) |
 | `expected_answer` | `text` | 정답 및 모범 가이드라인 (Robustness 검증용) |
-| `topic_path` | `jsonb` | 안내 카테고리 계층 구조 (예: `요금 > 모바일...`) |
-| `context_references` | `jsonb` | 필수 참조 문서 혹은 도구명 (Groundedness 검증용) |
+| `topic_path` | `text` | 안내 카테고리 계층 구조 (예: `요금 > 모바일...`) |
+| `context_references` | `jsonb` | 필수 참조 문서 전체 본문 혹은 도구의 예상 결괏값 (Groundedness 검증용) |
 | `intent_type` | `text` | 사용자의 핵심 질문 의도명 (Factoid, Compare 등) |
-| `created_at` | `timestamptz` | 역대 평가 내역 생성 일시 |
+| `is_synthetic` | `boolean` | LLM(`generate_qa.py`)이 증강한 합성 데이터인지 여부 |
+| `created_at` | `timestamptz` | 데이터 생성 일시 |
 
 ---
 
