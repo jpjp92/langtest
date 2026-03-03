@@ -66,7 +66,7 @@
 
 ---
 
-## �🚀 다음 실행 계획 (Next Steps)
+## 🚀 다음 실행 계획 (Next Steps)
 - [x] `generate_qa.py` 스크립트를 업그레이드하여, 다양한 조건과 상황이 부여된 합성 데이터(Synthetic Data)를 대량으로 자동 생성하고 DB에 병합하는 기능 추가.
 - [x] Supabase에 사용자 발화, 모델 응답, 피드백을 수집할 원시 로그 적재용 `evaluation_logs` 테이블 신규 생성.
 - [ ] Frontend 채팅창에 👍/👎 피드백 버튼 추가 및 Backend API 연동 (👍 클릭 시 `evaluation_logs`와 `evaluation_dataset` 동시 업데이트).
