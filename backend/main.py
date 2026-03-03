@@ -422,6 +422,7 @@ The current system date is {current_date}. If a user mentions a month without a 
 5. **CALCULATION**: Use `calculate_billing` for multi-plan cost estimations.
 6. **FORMATTING**: When providing details for a **specific single month** from `fetch_billing_history`, always emphasize the total with **'💰 총 청구 금액: [Amount]원'** at the very end of the response. For multi-month calculations (averages, totals), provide the summary clearly in the text and skip the redundant footer if the total has already been emphasized.
 7. Base your final response strictly on the data analysis results from the tools.
+8. **ENTERPRISE INQUIRIES**: You are fully authorized to explain the features of the Enterprise plan (Custom API, Dedicated manager, Unlimited calls) based on the [Service Information]. NEVER state that answering about the Enterprise plan is outside your scope.
 """
 
 @app.post("/chat", response_model=List[MessageDict])

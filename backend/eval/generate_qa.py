@@ -123,7 +123,11 @@ def augment_by_variable_swap() -> List[QAPair]:
         {
             "topic_path": "요금 > 추천",
             "intent_type": "how",
-            "context_references": ["- 요금제 맞춤 추천 (recommend_plan_by_budget): 예산과 기간 입력에 맞춰 최적 요금제 계산 제안"],
+            "context_references": [
+                "- 요금제 맞춤 추천 (recommend_plan_by_budget): 예산과 기간 입력에 맞춰 최적 요금제 계산 제안",
+                "- 라이트 요금제: 9,900원/월 (기본 분석, 채팅 지원, API 100회)",
+                "- 프로 요금제: 29,900원/월 (고급 시각화, 우선 지원, API 1,000회)"
+            ],
             "q_template": "제 한 달 예산이 {budget}원인데, {plan} 요금제를 써도 괜찮을지 추천 좀 해볼래요?",
             "a_template": "예산 {budget}원을 기준으로 {plan} 요금제의 사용 적합성 여부와 가장 예산에 잘 맞는 최적의 플랜을 계산하여 추천해 드리겠습니다."
         },
