@@ -47,8 +47,28 @@
 
 ---
 
-## 🚀 다음 실행 계획 (Next Steps)
+## 3. 백엔드 엔드포인트 세분화 방안 (Endpoint Strategy)
+
+현재의 단일 `/chat` 엔드포인트는 대화형(CUI) 인터페이스에 최적화되어 있으나, 향후 GUI 확장을 고려하여 다음과 같은 하이브리드 형태의 엔드포인트 세분화를 검토 및 적용할 예정입니다.
+
+### A. 목적별 라우팅 분리 (Hybrid Routing)
+- **자연어 대화 (기존 유지)**: `POST /chat`
+  - 복합적인 요구사항 처리 및 LangGraph 기반 ReAct 의도 추론
+- **단순 정보 조회 (신규 분리)**: `GET /billing/history`, `GET /billing/overage` 등
+  - 대시보드 렌더링, 요금 즉시 확인 등 LLM을 거칠 필요가 없는 빠른 DB 조회용
+- **명시적 상태 변경 (신규 분리)**: `POST /plan/change` 등
+  - 버튼 클릭을 통한 요금제 변경 등 사용자 의도가 명확한 경우, LLM 환각 방지 및 빠른 처리를 위해 분리
+
+### B. 기대 효과
+- **응답 속도(Latency) 대폭 개선**: 명시적인 액션에서 LLM 추론 대기 시간 제거
+- **API 비용(Token) 절감**: 단순 조회의 경우 불필요한 LLM 호출 제거
+- **아키텍처 안정성**: HTTP 상태 코드 및 캐싱 등을 활용한 세밀한 에러 리포팅 및 인프라 최적화
+
+---
+
+## �🚀 다음 실행 계획 (Next Steps)
 - [x] `generate_qa.py` 스크립트를 업그레이드하여, 다양한 조건과 상황이 부여된 합성 데이터(Synthetic Data)를 대량으로 자동 생성하고 DB에 병합하는 기능 추가.
 - [x] Supabase에 사용자 발화, 모델 응답, 피드백을 수집할 원시 로그 적재용 `evaluation_logs` 테이블 신규 생성.
 - [ ] Frontend 채팅창에 👍/👎 피드백 버튼 추가 및 Backend API 연동 (👍 클릭 시 `evaluation_logs`와 `evaluation_dataset` 동시 업데이트).
 - [ ] `eval_results.json` 및 `evaluation_logs`에 대한 통계/대시보드 화면(Frontend) 구축.
+- [ ] 대시보드 버튼/UI 추가 대비 향후 하이브리드 아키텍처 기반의 백엔드 엔드포인트 세분화(API 라우팅 분리) 설계.

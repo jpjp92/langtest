@@ -89,13 +89,13 @@ sequenceDiagram
 
 ### 4. 세부 도구 (Custom Tools) 설계 현황
 
-Agent가 활용하는 도구들은 역할에 따라 기능적으로 완전히 분리되어 설계되었습니다. 이를 통해 LLM의 환각을 제어하고, 정확한 데이터 기반의 상담을 제공합니다.
+Agent가 활용하는 도구들은 역할에 따라 기능적으로 완전히 분리되어 설계되었습니다. 이를 통해 LLM의 환각을 제어하고, 정확한 데이터 기반의 맞춤형 상담을 제공합니다.
 
-| 도구명 (함수명)                                 | 아키텍처 분류                                                             | 핵심 역할                                                                |
-| :---------------------------------------------- | :------------------------------------------------------------------------ | :----------------------------------------------------------------------- |
-| `calculate_billing,`recommend_plan_by_budget  | **Business Logic / Calculation Tools** (비즈니스 로직 및 계산 도구) | 내부 연산, 단가 정책 반영, 환각 방지 및 맞춤형 플랜 추천                 |
-| `fetch_billing_history,`analyze_overage_cause | **Data Retrieval**(데이터 검색 도구)                                | 외부 데이터 연동(Supabase DB), 사실 기반의 요금 청구 및 로그 데이터 검색 |
-| `change_subscription_plan`                    | **Action / State Mutation Tools** (상태 변경 및 실행 도구)          | 실질적인 데이터 변화(월별 연계 상태 업데이트) 생성 및 DB 반영            |
+| 아키텍처 분류 (Architecture) | 주요 도구명 (Functions) | 핵심 역할 (Core Role) |
+| :--- | :--- | :--- |
+| **비즈니스 로직 및 계산**<br>*(Business Logic/Calculation)* | `calculate_billing`<br>`recommend_plan_by_budget` | 내부 연산, 단가 정책 반영, 환각 방지 및 예산 맞춤형 플랜 추천 |
+| **데이터 검색 및 조회**<br>*(Data Retrieval)* | `fetch_billing_history`<br>`analyze_overage_cause` | 외부 데이터(Supabase DB) 연동, 사실 기반의 요금 청구 내역 및 초과 사용 로그 검색 |
+| **상태 변경 및 실행**<br>*(Action/State Mutation)* | `change_subscription_plan` | 실질적인 데이터 변화(월별 요금제 구독 예약/변경) 달성 및 DB 상태 업데이트 |
 
 ### 5. Pydantic 기반의 데이터 검증 (Data Validation)
 
