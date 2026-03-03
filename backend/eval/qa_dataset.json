@@ -5,7 +5,7 @@
         "question": "라이트 요금제의 월 기본료는 얼마인가요?",
         "expected_answer": "라이트 요금제는 월 9,900원입니다.",
         "context_references": [
-            "System Prompt > Service Information > Lite"
+            "라이트 요금제: 9,900원/월 (기본 분석, 채팅 지원, API 100회)"
         ],
         "intent_type": "factoid"
     },
@@ -15,7 +15,7 @@
         "question": "이번 달 청구 요금이 평소보다 왜 이렇게 많이 나왔나요?",
         "expected_answer": "요금 초과 사유(API 호출 한도 초과 또는 부가서비스 가입 등)를 분석하여 안내합니다.",
         "context_references": [
-            "Tools > analyze_overage_cause"
+            "요금 내역 조회 및 추가 분석 도구 결과: user_123의 2026년 3월 청구 금액에는 Premium Assets Pack 구매로 인한 부가 요금 10,000원이 포함되어 총 34,900원의 청구 금액이 발생했습니다. API 호출은 950회 사용으로 초과 요금이 없습니다."
         ],
         "intent_type": "why"
     },
@@ -25,7 +25,7 @@
         "question": "요금 결제할 때 사용할 수 있는 신용카드는 어떤 것들이 있나요?",
         "expected_answer": "국내/해외 주요 신용카드(Visa, Master, 현대, 삼성 등)를 모두 사용할 수 있습니다.",
         "context_references": [
-            "System Prompt > Payment Methods > Credit Cards"
+            "신용카드: 국내/해외 카드 (비자, 마스터, 삼성 등)"
         ],
         "intent_type": "list"
     },
@@ -35,7 +35,7 @@
         "question": "1년 예산이 20만원인데 어떤 요금제를 쓰는게 좋을까요?",
         "expected_answer": "예산 20만원에 맞춰 라이트 요금제 기본 사용 및 특정 월 프로 요금제 업그레이드 조합 등을 추천합니다.",
         "context_references": [
-            "Tools > recommend_plan_by_budget"
+            "요금제 예산 맞춤 추천 도구 결과: 1년 예산 200,000원 기준 Lite 요금제 12개월(118,800원) 사용을 추천하며, 예산 내에서 4개월간 Pro 요금제로 업그레이드 하는 하이브리드 조합도 가능합니다."
         ],
         "intent_type": "how"
     }

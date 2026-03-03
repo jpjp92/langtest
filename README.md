@@ -351,7 +351,7 @@ npm run dev
 
 ## 🗄️ 데이터베이스 스키마
 
-**Supabase 테이블: `billing_history`**
+**Supabase 테이블: `public.billing_history`**
 
 | 컬럼                  | 타입            | 설명                                                         |
 | :-------------------- | :-------------- | :----------------------------------------------------------- |
@@ -363,7 +363,7 @@ npm run dev
 
 <br>
 
-**Supabase 테이블: `evaluation_dataset` (LLM 평가용)**
+**Supabase 테이블: `public.evaluation_dataset` (LLM 평가용)**
 
 | 컬럼 | 타입 | 설명 |
 | :--- | :--- | :--- |

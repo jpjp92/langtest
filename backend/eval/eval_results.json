@@ -1,0 +1,86 @@
+{
+  "average_score": 87.53846153846155,
+  "total_evaluated": 5,
+  "details": [
+    {
+      "id": "dc7c1d07-31fd-4e55-b961-e14fe4dca2bf",
+      "score": 100.0,
+      "Grd": 25.0,
+      "Evi": 15.0,
+      "Cla": 10.0,
+      "Ato": 10.0,
+      "Rob": 5.0,
+      "actual_output": "라이트 요금제의 월 기본료는 9,900원입니다.",
+      "expected_output": "라이트 요금제는 월 9,900원입니다.",
+      "context": [
+        "라이트 요금제: 9,900원/월 (기본 분석, 채팅 지원, API 100회)"
+      ],
+      "reason_Grd": "The actual output '라이트 요금제의 월 기본료는 9,900원입니다' contains a single core factual claim. This claim is directly and explicitly supported by the retrieval context, which states '라이트 요금제: 9,900원/월'. The output is fully grounded in the provided context without requiring any external knowledge or assumptions.",
+      "reason_Evi": "The actual output makes a clear claim about the monthly fee for the '라이트 요금제' (Light plan). This claim, including the specific price '9,900원' and the '월' (monthly) duration, is explicitly and accurately present in the retrieval context. The output directly uses verifiable evidence from the context to support its statement."
+    },
+    {
+      "id": "53147ead-cae0-445a-a1d3-3f43e40683e8",
+      "score": 86.15384615384616,
+      "Grd": 17.5,
+      "Evi": 13.5,
+      "Cla": 10.0,
+      "Ato": 10.0,
+      "Rob": 5.0,
+      "actual_output": "이번 달 청구 요금이 평소보다 많이 나온 이유는 'Premium Assets Pack' 구매로 인한 부가/소액결제 10,000원이 추가되었기 때문입니다. API 호출은 1,000회 한도 내에서 950회로 정상 범위에 있었습니다.\n\n💰 총 청구 금액: 34,900원",
+      "expected_output": "요금 초과 사유(API 호출 한도 초과 또는 부가서비스 가입 등)를 분석하여 안내합니다.",
+      "context": [
+        "요금 내역 조회 및 추가 분석 도구 결과: user_123의 2026년 3월 청구 금액에는 Premium Assets Pack 구매로 인한 부가 요금 10,000원이 포함되어 총 34,900원의 청구 금액이 발생했습니다. API 호출은 950회 사용으로 초과 요금이 없습니다."
+      ],
+      "reason_Grd": "The response successfully grounds most of its factual claims in the retrieval context. The information regarding the 'Premium Assets Pack' purchase leading to a 10,000 KRW additional charge and the total bill amount of 34,900 KRW is explicitly present. Similarly, the API call count of 950 and the absence of excess charges are grounded. However, the claim that API calls were '1,000회 한도 내에서' (within a 1,000-call limit) is not explicitly stated in the retrieval context, which only mentions 950 calls with no excess charges. This specific detail is not solely derivable from the provided context, leading to a slight deviation from full grounding as per evaluation step 3.",
+      "reason_Evi": "The response accurately identifies the reason for the higher bill (Premium Assets Pack purchase of 10,000 won) and the total bill amount (34,900 won), both of which are explicitly and accurately supported by specific details from the Retrieval Context. The API call count (950회) is also correctly stated. However, the claim that API calls were '1,000회 한도 내에서' (within a 1,000-call limit) is not explicitly present in the Retrieval Context, although the context does confirm 950 calls with no excess charges, which supports the '정상 범위' (normal range) aspect."
+    },
+    {
+      "id": "3fb7c692-ba8c-4326-972c-627c78fb4646",
+      "score": 74.61538461538461,
+      "Grd": 10.0,
+      "Evi": 13.5,
+      "Cla": 10.0,
+      "Ato": 10.0,
+      "Rob": 5.0,
+      "actual_output": "신용카드의 경우, 국내외 주요 카드사(Visa, Master, 현대, 삼성 등) 모두 사용 가능합니다.",
+      "expected_output": "국내/해외 주요 신용카드(Visa, Master, 현대, 삼성 등)를 모두 사용할 수 있습니다.",
+      "context": [
+        "신용카드: 국내/해외 카드 (비자, 마스터, 삼성 등)"
+      ],
+      "reason_Grd": "The actual output claims that '현대' (Hyundai) credit cards are usable, but this specific detail is not present in the retrieval context. While 'Visa, Master, 삼성' are mentioned, the inclusion of '현대' makes the output not fully grounded in the provided context, violating Step 3.",
+      "reason_Evi": "The output accurately states that major domestic and international credit cards are usable and correctly identifies Visa, Master, and Samsung as examples, directly matching the specific terms and card companies listed in the Retrieval Context. However, the output includes '현대' as an example card company, which is not explicitly present in the provided context, making it a minor unsupported detail."
+    },
+    {
+      "id": "4efcce79-f174-4b6e-92e4-626a44ab51f0",
+      "score": 76.92307692307693,
+      "Grd": 10.0,
+      "Evi": 15.0,
+      "Cla": 10.0,
+      "Ato": 10.0,
+      "Rob": 5.0,
+      "actual_output": "1년 예산 200,000원에 대한 추천 요금제는 다음과 같습니다:\n\n✅ **[Lite 추천]** 12개월 동안 안정적으로 기본 기능을 이용하실 수 있습니다. (총 118,800원)\n💡 **[하이브리드안]** 라이트 요금제를 기본으로 사용하시다가, 중요한 프로젝트가 있는 4개월 동안은 프로 요금제로 업그레이드하셔도 예산 범위 내에서 이용 가능합니다.",
+      "expected_output": "예산 20만원에 맞춰 라이트 요금제 기본 사용 및 특정 월 프로 요금제 업그레이드 조합 등을 추천합니다.",
+      "context": [
+        "요금제 예산 맞춤 추천 도구 결과: 1년 예산 200,000원 기준 Lite 요금제 12개월(118,800원) 사용을 추천하며, 예산 내에서 4개월간 Pro 요금제로 업그레이드 하는 하이브리드 조합도 가능합니다."
+      ],
+      "reason_Grd": "The response accurately extracts the recommended Lite plan duration and cost (12개월, 118,800원) and the possibility of a hybrid plan involving a 4-month Pro upgrade, which are present in the retrieval context. However, it includes two claims that are not explicitly grounded: '안정적으로 기본 기능을 이용하실 수 있습니다' regarding the Lite plan, and more critically, '중요한 프로젝트가 있는' as the reason for upgrading to the Pro plan for 4 months. The context only states that a hybrid combination is possible within budget, without specifying the reason for the upgrade, thus violating the requirement for all claims to be solely derivable from the provided context.",
+      "reason_Evi": "The response accurately identifies the recommended plans and their details, including the 1-year budget of 200,000 won, the Lite plan's 12-month duration and 118,800 won cost, and the hybrid option of upgrading to a Pro plan for 4 months within the budget. All specific claims and numerical evidence presented in the Actual Output are explicitly present and accurate in the Retrieval Context."
+    },
+    {
+      "id": "4c605d4b-a273-4abf-bfb1-4caaab71d529",
+      "score": 100.0,
+      "Grd": 25.0,
+      "Evi": 15.0,
+      "Cla": 10.0,
+      "Ato": 10.0,
+      "Rob": 5.0,
+      "actual_output": "라이트 요금제는 월 9,900원입니다.",
+      "expected_output": "라이트 요금제는 월 9,900원입니다.",
+      "context": [
+        "라이트 요금제: 9,900원/월 (기본 분석, 채팅 지원, API 100회)"
+      ],
+      "reason_Grd": "The actual output '라이트 요금제는 월 9,900원입니다.' contains a single core factual claim. This claim is directly and explicitly supported by the retrieval context, which states '라이트 요금제: 9,900원/월'. All information in the response is fully grounded in the provided context without requiring external knowledge.",
+      "reason_Evi": "The actual output makes a clear claim about the '라이트 요금제' (Lite plan) costing '월 9,900원' (9,900 won/month). This claim is directly and explicitly supported by the retrieval context, which states '라이트 요금제: 9,900원/월'. The evidence is specific and verifiable."
+    }
+  ]
+}

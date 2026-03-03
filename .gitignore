@@ -42,3 +42,5 @@ uvlist.json
 # eval
 backend/eval/.deepeval
 .deepeval/
+backend/eval/eval_stderr.log
+backend/eval/eval_final.log

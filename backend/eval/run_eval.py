@@ -2,6 +2,12 @@ import os
 import json
 import asyncio
 from dotenv import load_dotenv
+
+# 평가 실행 시 메인 에이전트(app_graph)도 EVAL_GEMINI_API_KEY를 사용하도록 환경변수 강제 덮어쓰기
+load_dotenv()
+if os.getenv("EVAL_GEMINI_API_KEY"):
+    os.environ["GOOGLE_API_KEY"] = os.environ["EVAL_GEMINI_API_KEY"]
+
 from supabase import create_client, Client
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn
@@ -20,8 +26,7 @@ from eval_metrics import (
     robustness_metric
 )
 
-# 백엔드 API 대신 LangGraph 에이전트 모듈 직접 연동
-from backend.main import app_graph, HumanMessage, AIMessage
+from backend.main import app_graph, HumanMessage, AIMessage, SystemMessage, SYSTEM_PROMPT
 
 load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -33,13 +38,24 @@ def fetch_eval_data_from_db():
     response = supabase.table("evaluation_dataset").select("*").execute()
     return response.data
 
-async def generate_agent_response(question: str, user_id: str) -> str:
-    """Agent에 비동기로 질문을 던져 응답을 가져옵니다."""
+async def generate_agent_response(question: str, user_id: str, retries=3) -> str:
+    """Agent에 비동기로 질문을 던져 응답을 가져옵니다. (Rate Limit 대응)"""
     config = {"configurable": {"thread_id": f"eval_{user_id}"}}
-    input_data = {"messages": [HumanMessage(content=question)]}
+    input_data = {"messages": [SystemMessage(content=SYSTEM_PROMPT), HumanMessage(content=question)]}
     
-    final_state = await app_graph.ainvoke(input_data, config=config)
-    ai_msg = next((m for m in reversed(final_state["messages"]) if isinstance(m, AIMessage)), None)
+    for attempt in range(retries):
+        try:
+            final_state = await app_graph.ainvoke(input_data, config=config)
+            ai_msg = next((m for m in reversed(final_state["messages"]) if isinstance(m, AIMessage)), None)
+            break
+        except Exception as e:
+            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                if attempt < retries - 1:
+                    await asyncio.sleep(20)
+                else:
+                    return "응답 없음 (Rate Limit)"
+            else:
+                return f"응답 없음 ({e})"
     
     if not ai_msg:
         return "응답 없음"
@@ -136,7 +152,12 @@ async def main():
                 results_log.append({
                     "id": q_id,
                     "score": scaled_100,
-                    "Grd": g_score, "Evi": e_score, "Cla": c_score, "Ato": a_score, "Rob": r_score
+                    "Grd": g_score, "Evi": e_score, "Cla": c_score, "Ato": a_score, "Rob": r_score,
+                    "actual_output": actual_answer,
+                    "expected_output": expected_ans,
+                    "context": context_refs,
+                    "reason_Grd": groundedness_metric.reason,
+                    "reason_Evi": evidenceability_metric.reason
                 })
                 
             except Exception as e:

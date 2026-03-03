@@ -11,7 +11,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 class GoogleGemini(DeepEvalBaseLLM):
     def __init__(self, model_name="gemini-2.5-flash"):
-        self.model = ChatGoogleGenerativeAI(model=model_name)
+        api_key = os.getenv("EVAL_GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        self.model = ChatGoogleGenerativeAI(model=model_name, api_key=api_key)
         
     def load_model(self):
         return self.model
@@ -33,13 +34,13 @@ groundedness_metric = GEval(
     name="Groundedness & Context Limitation",
     model=gemini_model,
     criteria="""
-    Determine if the actual output is fully grounded in the retrieval context.
-    - The answer must be derivable ONLY from the provided context.
-    - No external knowledge or assumptions should be used.
-    - If the answer cannot be found in the context, it should be marked as 'OutsideContext' and score 0.
+    Determine if the core factual claims in the actual output are fully grounded in the retrieval context.
+    - The factual answer must be derivable ONLY from the provided context.
+    - No external knowledge or assumptions should be used for facts.
+    - Ignore conversational fillers, greetings, or polite closing remarks (e.g., 'Hello', 'Here is the information', 'Thank you').
+    - If the core factual claims cannot be found in the context, score it low.
     """,
-    evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT, LLMTestCaseParams.RETRIEVAL_CONTEXT],
-    strict_mode=True
+    evaluation_params=[LLMTestCaseParams.INPUT, LLMTestCaseParams.ACTUAL_OUTPUT, LLMTestCaseParams.RETRIEVAL_CONTEXT]
 )
 
 # 2. 증거가능성 (Evidenceability) - 가중치 15

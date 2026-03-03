@@ -50,6 +50,11 @@ def main():
         return
 
     try:
+        # 기존 데이터 삭제 (테이블 초기화)
+        print("🗑️ DB의 기존 평가 데이터셋을 모두 삭제합니다...")
+        # Supabase Python 클라이언트에서는 필터 없이 전체 삭제가 불안정할 수 있으므로 팩트가 일치하는 광범위한 조건 사용
+        supabase.table("evaluation_dataset").delete().neq("question", "dummy_never_exists").execute()
+
         # Supabase bulk insert
         response = supabase.table("evaluation_dataset").insert(combined_data).execute()
         print(f"✅ 총 {len(combined_data)}개의 데이터가 'evaluation_dataset' 테이블에 성공적으로 업로드되었습니다.")

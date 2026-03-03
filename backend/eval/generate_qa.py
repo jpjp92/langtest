@@ -15,14 +15,15 @@ class QAPair(BaseModel):
     topic_path: str = Field(description="카테고리 경로 (예: '요금 > 모바일 > 라이트 요금제 > 요금안내')")
     question: str = Field(description="평가용 질문 (다양한 의도와 표현 방식 포함)")
     expected_answer: str = Field(description="모범 답안 (핵심 내용)")
-    context_references: List[str] = Field(description="질문의 근거가 되는 시스템 프롬프트 섹션 또는 도구 이름 목록")
+    context_references: List[str] = Field(description="질문의 정확한 근거가 되는 시스템 프롬프트의 실제 문장/본문 텍스트 목록 (단순 제목이 아닌 실제 내용 전체)")
     intent_type: str = Field(description="의도 유형 (factoid, why, list, boolean, how, procedure 등)")
 
 class QADataset(BaseModel):
     qa_pairs: List[QAPair] = Field(description="생성된 질문 답변 쌍 목록 (10~15개 요청)")
 
 # Gemini LLM 초기화 (Structured Output 적용)
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
+eval_api_key = os.getenv("EVAL_GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", api_key=eval_api_key)
 structured_llm = llm.with_structured_output(QADataset)
 
 def generate_synthetic_qa() -> None:
@@ -56,6 +57,7 @@ def generate_synthetic_qa() -> None:
     2. 질문 의도(intent_type)가 한쪽으로 치우치지 않도록 골고루 섞어주세요.
        (예: 단순 사실 확인(factoid), 이유 분석(why), 목록 나열(list), 예/아니오(boolean), 절차나 방법(how/procedure))
     3. 동일한 의미를 묻더라도 다른 어휘(동의어)로 변형한 질문 등 다양성을 높이세요.
+    4. [중요] context_references 에는 단순히 카테고리나 섹션 이름만 넣지 말고, 답변의 확실한 근거가 되는 **실제 컨텍스트 본문 문장(Text)**을 그대로 복사해서 넣어주세요. (예: "라이트 요금제: 9,900원/월 (기본 분석, 채팅 지원, API 100회)")
     
     [기술 컨텍스트]
     {context}
