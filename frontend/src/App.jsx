@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Send, User, Bot, CreditCard, PieChart, HelpCircle, Loader2, AlertCircle, Zap, Calculator, ArrowRightLeft, Info, X, Moon, Sun } from 'lucide-react';
+import { Bot, User, Send, CreditCard, PieChart, Calculator, ArrowRightLeft, Info, X, Moon, Sun, Camera, Zap, Loader2, AlertCircle, HelpCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toPng } from 'html-to-image';
 
 const getApiUrl = () => {
   // 개발 환경이나 환경 변수가 설정된 경우 우선 사용
@@ -66,6 +67,40 @@ function App() {
     }
   };
 
+  const handleCapture = async () => {
+    if (!scrollRef.current) return;
+
+    try {
+      setIsLoading(true);
+      const target = scrollRef.current;
+
+      // html-to-image를 사용하여 캡처 시, 스크롤 영역 전체를 잡기 위한 설정 추가
+      const dataUrl = await toPng(target, {
+        backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc',
+        pixelRatio: 2,
+        width: target.scrollWidth,
+        height: target.scrollHeight,
+        style: {
+          overflow: 'visible',
+          maxHeight: 'none',
+          height: `${target.scrollHeight}px`,
+        }
+      });
+
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `billing-ai-chat-${new Date().getTime()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Screenshot capture failed:', error);
+      alert('스크린샷 저장 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const quickStyles = [
     { icon: <CreditCard className="w-5 h-5" />, label: '요금제 둘러보기', text: '현재 이용 가능한 모든 요금제 종류와 특징을 알려줘' },
     { icon: <PieChart className="w-5 h-5" />, label: '월별 요금 분석', text: '지난 달 청구된 상세 요금 내역을 분석해줘' },
@@ -87,6 +122,15 @@ function App() {
           </div>
         </div>
         <div className="flex items-center space-x-1">
+          {/* Screenshot Toggle */}
+          <button
+            onClick={handleCapture}
+            className="p-2 text-slate-400 dark:text-slate-300 hover:text-brand dark:hover:text-brand-light transition-colors relative group"
+            title="대화 내역 저장"
+          >
+            <Camera className="w-5 h-5" />
+          </button>
+
           {/* Dark Mode Toggle */}
           <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 text-slate-400 dark:text-slate-300 hover:text-brand dark:hover:text-amber-400 transition-colors relative group">
             {isDarkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
@@ -160,6 +204,14 @@ function App() {
                   </button>
                 </div>
               </div>
+
+              <div className="space-y-3">
+                <h3 className="text-[15px] font-semibold text-slate-800 dark:text-slate-200 flex items-center transition-colors"><Camera className="w-4 h-4 mr-2 text-rose-500" /> 대화 내용 저장 가이드</h3>
+                <div className="text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-100 dark:border-slate-800/80 leading-relaxed transition-colors duration-300">
+                  상단의 <Camera className="w-3 h-3 inline-block" /> 아이콘을 클릭하면 현재까지의 대화 내역을 이미지 파일(.png)로 저장할 수 있습니다.
+                  중요한 분석 내용이나 추천 요금제 정보를 보관할 때 활용하세요!
+                </div>
+              </div>
             </div>
 
             <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-700/50 transition-colors">
@@ -179,8 +231,10 @@ function App() {
         <AnimatePresence initial={false}>
           {messages.length === 0 && (
             <motion.div
+              key="empty-state"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
               className="max-w-2xl mx-auto mt-20 text-center space-y-8"
             >
               <div className="space-y-4">
@@ -212,7 +266,7 @@ function App() {
 
           {messages.map((msg, idx) => (
             <motion.div
-              key={idx}
+              key={`msg-${idx}-${msg.role}`}
               initial={{ opacity: 0, x: msg.role === 'user' ? 20 : -20 }}
               animate={{ opacity: 1, x: 0 }}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
